@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:listify/screens/forgetPassword_Screen.dart';
 import 'package:listify/screens/homepage.dart';
+import 'package:listify/screens/login_screen.dart';
+import 'package:listify/screens/register_screen.dart';
+import 'package:listify/screens/start_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -18,7 +22,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
-      home: const HomePage(title: 'Flutter Demo Home Page'),
+      home: const ForgetPasswordScreen(),
     );
   }
 }
