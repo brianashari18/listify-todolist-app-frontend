@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:listify/widgets/task_widget.dart';
 
+import '../models/user_model.dart';
+
 class HomePage extends StatefulWidget {
-  const HomePage({super.key, required this.title});
+  const HomePage({super.key, required this.title, required this.user});
 
   final String title;
+  final User user;
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -14,7 +17,9 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: const Color.fromRGBO(68, 64, 77, 1),
         // Warna latar belakang AppBar
         title: Row(
@@ -41,18 +46,18 @@ class _HomePageState extends State<HomePage> {
             const SizedBox(
               width: 16,
             ),
-            const Column(
+            Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Hi, Sari!',
-                  style: TextStyle(
+                  'Hi, ${widget.user.username}!',
+                  style: const TextStyle(
                     fontSize: 16, // Ukuran font teks utama
                     color: Color.fromRGBO(245, 245, 245, 1), // Warna teks
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                Text(
+                const Text(
                   'Welcome back',
                   style: TextStyle(
                     fontSize: 14, // Ukuran font teks tambahan
