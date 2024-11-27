@@ -15,8 +15,10 @@ class HomePageWorkspace extends StatefulWidget {
 
 class _HomePageWorkspaceState extends State<HomePageWorkspace> {
   final TextEditingController _taskController = TextEditingController();
-  List<String> tasks = [];
-  Color selectedColor = const Color.fromRGBO(123, 119, 1, 1);
+  List<Map<String, dynamic>> tasks = [];
+  Color defaultColor = const Color.fromRGBO(123, 119, 148, 1);
+  Color selectedColor = const Color.fromRGBO(123, 119, 148, 1);
+  bool _isSelected = false;
 
   @override
   void dispose() {
@@ -68,7 +70,7 @@ class _HomePageWorkspaceState extends State<HomePageWorkspace> {
                 width: double.infinity,
                 height: 45,
                 decoration: BoxDecoration(
-                  color: selectedColor,  // Set the background color to the selected color
+                  color: _isSelected ? selectedColor : defaultColor,  // Set the background color to the selected color
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
                     color: Colors.black.withOpacity(0.1),  // Optional border for better visibility
@@ -100,7 +102,11 @@ class _HomePageWorkspaceState extends State<HomePageWorkspace> {
                       if (_taskController.text.isNotEmpty) {
                         setState(() {
                           // Add task text and selected color to list
-                          tasks.add(_taskController.text);
+                          tasks.add({
+                            'task': _taskController.text,
+                            'color': selectedColor,
+                          });
+                          _isSelected = false;
                           _taskController.clear(); // Clear the text field
                         });
                       }
@@ -130,13 +136,14 @@ class _HomePageWorkspaceState extends State<HomePageWorkspace> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Pick a Color'),
           content: SingleChildScrollView(
             child: ColorPicker(
-              pickerColor: selectedColor,
+              pickerColor: _isSelected ? selectedColor : defaultColor,
               onColorChanged: (color) {
+                // Immediate color update using setState
                 setState(() {
-                  selectedColor = color;
+                  selectedColor = color;  // Update selected color
+                  _isSelected = true;      // Mark that a color has been selected
                 });
               },
               showLabel: true,
@@ -146,6 +153,9 @@ class _HomePageWorkspaceState extends State<HomePageWorkspace> {
           actions: <Widget>[
             TextButton(
               onPressed: () {
+                setState(() {
+                  _isSelected = true; // Ensure that color change is applied immediately
+                });
                 Navigator.of(context).pop();  // Close the color picker dialog
               },
               child: const Text('Close'),
@@ -155,6 +165,7 @@ class _HomePageWorkspaceState extends State<HomePageWorkspace> {
       },
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -322,10 +333,15 @@ class _HomePageWorkspaceState extends State<HomePageWorkspace> {
                       ),
                       itemCount: tasks.length,
                       itemBuilder: (context, index) {
-                        return TaskWidget(text: tasks[index], color: selectedColor,);
+                        // Access the 'task' and 'color' from the map at index
+                        String taskText = tasks[index]['task'];
+                        Color taskColor = tasks[index]['color'];
+
+                        return TaskWidget(text: taskText, color: taskColor);
                       },
                     ),
-                  ),
+                  )
+
                 ],
               ),
             ),
