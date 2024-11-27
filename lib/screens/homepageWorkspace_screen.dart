@@ -185,7 +185,7 @@ class _HomePageWorkspaceState extends State<HomePageWorkspace> {
                       ),
                       itemCount: tasks.length,
                       itemBuilder: (context, index) {
-                        return TaskWidget(index: index);
+                        return TaskWidget(text: tasks[index]);
                       },
                     ),
                   ),
