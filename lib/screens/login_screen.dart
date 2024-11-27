@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'dart:convert';
 import 'package:listify/screens/homepage.dart';
+import 'package:listify/screens/register_screen.dart';
 
 import '../models/user_model.dart';
 import '../services/api_service.dart';
@@ -92,6 +93,7 @@ class _LoginScreenState extends State<LoginScreen> {
           final responseUser =
               await ApiService.getCurrent("/api/users/current", accessToken);
 
+
           if (responseUser.statusCode == 200) {
             final Map<String, dynamic> responseData =
                 jsonDecode(responseUser.body);
@@ -166,6 +168,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _signInWithGoogle() async {
     try {
+
+
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
 
       if (googleUser == null) {
@@ -360,7 +364,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     alignment: Alignment.center,
                     child: InkWell(
                       onTap: () {
-                        // Tambahkan aksi untuk pendaftaran akun baru
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => const RegisterScreen()));
                       },
                       splashColor: Colors.transparent,
                       highlightColor: Colors.transparent,

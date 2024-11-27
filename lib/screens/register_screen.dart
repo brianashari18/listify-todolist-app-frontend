@@ -108,7 +108,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           "confirmPassword": confirmPassword
         };
         final responseInput =
-        await ApiService.register("/api/users", requestBody);
+        await ApiService.register("/api/users/register", requestBody);
 
         if (responseInput.statusCode == 200) {
           ScaffoldMessenger.of(context).showSnackBar(
