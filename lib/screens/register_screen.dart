@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'dart:convert'; // Untuk mengubah data ke format JSON
 import 'package:http/http.dart' as http;
 import 'package:listify/screens/login_screen.dart';
@@ -17,8 +16,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPassController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
-
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   String? _emailError;
   String? _usernameError;
@@ -161,68 +158,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ),
       ],
     );
-  }
-
-  Future<void> _signUpWithGoogle() async {
-    try {
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-
-      if (googleUser == null) {
-        // If the user cancels the login
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Google Sign-In canceled")),
-        );
-        return;
-      }
-
-      final GoogleSignInAuthentication googleAuth =
-      await googleUser.authentication;
-
-      // Get the tokens for backend or Firebase authentication
-      final String? idToken = googleAuth.idToken;
-      final String? accessToken = googleAuth.accessToken;
-
-      final responseGoogle = await http.post(
-        Uri.parse("http://localhost:8080/api/users/register"),
-        // Use HTTPS for security
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({
-          "username": googleUser.displayName,
-          "email": googleUser.email,
-          "idToken": idToken,
-          "accessToken": accessToken,
-        }),
-      );
-
-      if (responseGoogle.statusCode == 200) {
-        // If the login/registration was successful
-        final responseData = jsonDecode(responseGoogle.body);
-        final message = responseData['message'] ?? 'Registration successful';
-
-        // Show success message
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Registration Successful: $message")),
-        );
-
-        // Optionally, navigate to another screen or update UI here
-        print("Response: ${responseGoogle.body}");
-      } else {
-        // Handle error if the backend response is not 200
-        final responseData = jsonDecode(responseGoogle.body);
-        final error = responseData['error'] ?? 'Unknown error occurred';
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error: $error")),
-        );
-        print("Error: ${responseGoogle.body}");
-      }
-    } catch (error) {
-      // Handle any exceptions (e.g., network errors or API failures)
-      print("Google Sign-In failed: $error");
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Google Sign-In failed")),
-      );
-    }
   }
 
   @override
@@ -452,7 +387,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   const SizedBox(height: 15),
                   GestureDetector(
-                    onTap: _signUpWithGoogle,
+                    onTap: (){},
                     child: Image.asset(
                       'assets/icons/google.png',
                       height: 40,
