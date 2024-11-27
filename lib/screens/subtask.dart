@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:listify/widgets/subtask_widget.dart';
+import '../models/user_model.dart';
 
 class SubTask extends StatefulWidget {
   const SubTask({super.key});
@@ -6,31 +8,142 @@ class SubTask extends StatefulWidget {
   @override
   State<SubTask> createState() => _SubTaskState();
 }
-
 class _SubTaskState extends State<SubTask> {
-  final List<Map<String, dynamic>> _tasks = [
-    {"title": "Make Power Point", "completed": false},
-    {"title": "Review Documents", "completed": true},
-    {"title": "Finalize Draft", "completed": true},
-  ];
+  final TextEditingController _subtaskController = TextEditingController();
+  List<String> tasks = [];
+  Color selectedColor = const Color.fromRGBO(123, 119, 148, 1);
 
-  void _addTask(String taskTitle) {
-    setState(() {
-      _tasks.add({"title": taskTitle, "completed": false});
-    });
+  @override
+  void dispose() {
+    _subtaskController.dispose();
+    super.dispose();
   }
+void addTask() {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true, // Makes the bottom sheet dynamic
+    backgroundColor: const Color.fromRGBO(245, 245, 245, 1),
+    builder: (BuildContext context) {
+      return Padding(
+        padding: const EdgeInsets.all(20), // Padding around bottom sheet
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              "Add New Task",
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 20),
+            TextField(
+              controller: _subtaskController,
+              decoration: InputDecoration(
+                hintText: "Enter task",
+                hintStyle: const TextStyle(
+                  fontSize: 14,
+                  color: Colors.black45,
+                ),
+                border: UnderlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                filled: true,
+                fillColor: const Color.fromRGBO(191, 191, 191, 1),
+              ),
+            ),
+            // const SizedBox(height: 20),
+            // TextField(
+            //   controller: _taskController,
+            //   decoration: InputDecoration(
+            //     hintText: "Deadline",
+            //     hintStyle: const TextStyle(
+            //       fontSize: 14,
+            //       color: Colors.black45,
+            //     ),
+            //     border: UnderlineInputBorder(
+            //       borderRadius: BorderRadius.circular(10),
+            //     ),
+            //     contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+            //     filled: true,
+            //     fillColor: const Color.fromRGBO(191, 191, 191, 1),
+            //   ),
+            // ),
+            // const SizedBox(height: 20),
+            // TextField(
+            //   controller: _taskController,
+            //   decoration: InputDecoration(
+            //     hintText: "Status",
+            //     hintStyle: const TextStyle(
+            //       fontSize: 14,
+            //       color: Colors.black45,
+            //     ),
+            //     border: UnderlineInputBorder(
+            //       borderRadius: BorderRadius.circular(10),
+            //     ),
+            //     contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+            //     filled: true,
+            //     fillColor: const Color.fromRGBO(191, 191, 191, 1),
+            //   ),
+            // ),
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    if (_subtaskController.text.isNotEmpty) {
+                      setState(() {
+                        // Add task text and selected color to list
+                        tasks.add(_subtaskController.text);
+                        _subtaskController.text = ''; // Clear the text field
+                      });
+                    }
+                    Navigator.of(context).pop(); // Close the bottom sheet
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromRGBO(123, 119, 148, 1),
+                    foregroundColor: const Color.fromRGBO(245, 245, 245, 1),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 30),
+                  ),
+                  child: const Text("Done"),
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
+// class _HomePagePersonalState extends State<HomePagePersonal> {
+//   final TextEditingController _taskController = TextEditingController();
+//   List<String> tasks = [];
 
-  void _deleteTask(int index) {
-    setState(() {
-      _tasks.removeAt(index);
-    });
-  }
 
-  void _toggleTaskCompletion(int index) {
-    setState(() {
-      _tasks[index]["completed"] = !_tasks[index]["completed"];
-    });
-  }
+
+  // void _addTask(String taskTitle) {
+  //   setState(() {
+  //     tasks.add({"title": taskTitle, "completed": false});
+  //   });
+  // }
+
+  // void _deleteTask(int index) {
+  //   setState(() {
+  //     tasks.removeAt(index);
+  //   });
+  // }
+
+  // void _toggleTaskCompletion(int index) {
+  //   setState(() {
+  //     tasks[index]["completed"] = !tasks[index]["completed"];
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -80,43 +193,44 @@ class _SubTaskState extends State<SubTask> {
               ),
             ),
           ),
-          // Daftar Tugas
-          Positioned.fill(
-            top: 260, // Mulai setelah header
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 60),
-                child: Column(
-                  children: _tasks.asMap().entries.map((entry) {
-                    int index = entry.key;
-                    var task = entry.value;
-                    return Column(
-                      children: [
-                        TaskItem(
-                          title: task["title"],
-                          completed: task["completed"],
-                          onToggle: () => _toggleTaskCompletion(index),
-                          onDelete: () => _deleteTask(index),
-                        ),
-                        const SizedBox(height: 10),
-                      ],
-                    );
-                  }).toList(),
-                ),
-              ),
-            ),
-          ),
+          // // Daftar Tugas
+          // Positioned.fill(
+          //   top: 260, // Mulai setelah header
+          //   child: SingleChildScrollView(
+          //     child: Padding(
+          //       padding: const EdgeInsets.symmetric(vertical: 60),
+          //       child: Column(
+          //         children: tasks.asMap().entries.map((entry) {
+          //           int index = entry.key;
+          //           var task = entry.value;
+          //           return Column(
+          //             children: [
+          //               TaskItem(
+          //                 title: task["title"],
+          //                 completed: task["completed"],
+          //                 onToggle: () => _toggleTaskCompletion(index),
+          //                 onDelete: () => _deleteTask(index),
+          //               ),
+          //               const SizedBox(height: 10),
+          //             ],
+          //           );
+          //         }).toList(),
+          //       ),
+          //     ),
+          //   ),
+          // ),
           // Tombol Plus
           Positioned(
             top: 230, // Sesuaikan posisi tombol
             left: MediaQuery.of(context).size.width / 2 - 28,
             child: FloatingActionButton(
               onPressed: () {
+                addTask();
                 // Tambahkan aksi menambah task
-                showDialog(
-                  context: context,
-                  builder: (context) => AddTaskDialog(onSubmit: _addTask),
-                );
+                // showDialog(
+                //   context: context,
+                //   builder: (context) => addTask(),
+                // );
               },
               backgroundColor: Colors.white,
               child: const Icon(Icons.add, color: Colors.black),

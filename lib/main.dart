@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:listify/screens/about_screen.dart';
 import 'package:listify/screens/forgetPassword_Screen.dart';
 import 'package:listify/screens/homepagePersonal_screen.dart';
 import 'package:listify/screens/homepageWorkspace_screen.dart';
 import 'package:listify/screens/login_screen.dart';
 import 'package:listify/screens/register_screen.dart';
 import 'package:listify/screens/start_screen.dart';
+import 'package:listify/screens/subtask.dart';
 
 import 'models/user_model.dart';
 
@@ -25,7 +27,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
-      home: HomePagePersonal(user: User(id: 1, username: 'test', email: 'test@example.com')),
+      home:AboutPage(),
     );
   }
 }
