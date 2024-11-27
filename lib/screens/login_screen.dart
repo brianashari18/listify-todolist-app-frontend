@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:listify/screens/forgetPassword_Screen.dart';
 import 'dart:convert';
 import 'package:listify/screens/homepagePersonal_screen.dart';
+import 'package:listify/screens/register_screen.dart';
 
 import '../models/user_model.dart';
 import '../services/api_service.dart';
@@ -77,8 +79,9 @@ class _LoginScreenState extends State<LoginScreen> {
           "email": email,
           "password": password,
         };
+
         final response =
-            await ApiService.login("/api/users/login", requestBody);
+        await ApiService.login("/api/users/login", requestBody);
 
         if (response.statusCode == 200) {
           // Login berhasil
@@ -90,11 +93,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
           final accessToken = responseBody['data']['token'];
           final responseUser =
-              await ApiService.getCurrent("/api/users/current", accessToken);
+          await ApiService.getCurrent("/api/users/current", accessToken);
 
           if (responseUser.statusCode == 200) {
             final Map<String, dynamic> responseData =
-                jsonDecode(responseUser.body);
+            jsonDecode(responseUser.body);
             final data = responseData["data"];
             print("User data: $data");
 
@@ -106,9 +109,9 @@ class _LoginScreenState extends State<LoginScreen> {
             Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute(
                     builder: (context) => HomePagePersonal(
-                          user: user,
-                        )),
-                (Route<dynamic> route) => false);
+                      user: user,
+                    )),
+                    (Route<dynamic> route) => false);
           } else if (responseUser.statusCode == 401) {
             // Jika status code 401 (Unauthorized), artinya akses token tidak valid atau telah kedaluwarsa
             print("Unauthorized access. Please login again.");
@@ -177,14 +180,25 @@ class _LoginScreenState extends State<LoginScreen> {
 
       final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
+      final String? accessToken = googleAuth
+          .accessToken; // Bisa digunakan untuk Firebase Authentication (optional)
+      final String? idToken = googleAuth
+          .idToken; // Bisa digunakan untuk Firebase Authentication (optional)
 
-      // Ambil token untuk dikirim ke backend atau digunakan untuk otentikasi Firebase
-      final String? idToken = googleAuth.idToken;
-      final String? accessToken = googleAuth.accessToken;
+// Mengambil authorization code yang digunakan untuk backend
+      final String? authCode =
+          googleUser.serverAuthCode; // Gunakan serverAuthCode yang baru
 
-      print("Google Sign-In successful");
-      print("ID Token: $idToken");
-      print("Access Token: $accessToken");
+// Kirimkan authorization code ke backend
+      if (authCode != null) {
+        final responseGoogle = await ApiService.loginWithGoogle(
+            "/api/users/google/callback", authCode);
+
+        // Tampilkan response dari server
+        print(responseGoogle);
+      } else {
+        print('Authorization code is missing');
+      }
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Welcome ${googleUser.displayName}!")),
@@ -290,7 +304,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     alignment: Alignment.centerRight,
                     child: InkWell(
                       onTap: () {
-                        // Tambahkan aksi untuk lupa password
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) =>
+                                const ForgetPasswordScreen()));
                       },
                       splashColor: Colors.transparent,
                       highlightColor: Colors.transparent,
@@ -359,7 +375,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     alignment: Alignment.center,
                     child: InkWell(
                       onTap: () {
-                        // Tambahkan aksi untuk pendaftaran akun baru
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => const RegisterScreen()));
                       },
                       splashColor: Colors.transparent,
                       highlightColor: Colors.transparent,

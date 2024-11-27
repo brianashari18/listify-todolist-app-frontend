@@ -21,9 +21,9 @@ class ApiService {
     );
   }
 
-  static Future<http.Response> loginWithGoogle(String url) {
+  static Future<http.Response> loginWithGoogle(String url, String code) {
     return http.post(
-      Uri.parse("$baseUrl$url"),
+      Uri.parse("$baseUrl$url?code=$code")
     );
   }
 
@@ -33,6 +33,22 @@ class ApiService {
         headers: {
           "Authorization": token
         }
+    );
+  }
+
+  static Future<http.Response> forgotPassword(String url, Map<String, dynamic> requestBody) {
+    return http.post(
+      Uri.parse("$baseUrl$url"),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode(requestBody),
+    );
+  }
+
+  static Future<http.Response> validateOTP(String url, Map<String, dynamic> requestBody) {
+    return http.post(
+      Uri.parse("$baseUrl$url"),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode(requestBody),
     );
   }
 }
