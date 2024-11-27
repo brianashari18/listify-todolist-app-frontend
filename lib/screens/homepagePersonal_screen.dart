@@ -15,8 +15,10 @@ class HomePagePersonal extends StatefulWidget {
 
 class _HomePagePersonalState extends State<HomePagePersonal> {
   final TextEditingController _taskController = TextEditingController();
-  List<String> tasks = [];
+  List<Map<String, dynamic>> tasks = [];
+  Color defaultColor = const Color.fromRGBO(123, 119, 148, 1);
   Color selectedColor = const Color.fromRGBO(123, 119, 148, 1);
+  bool _isSelected = false;
 
   @override
   void dispose() {
@@ -39,7 +41,7 @@ class _HomePagePersonalState extends State<HomePagePersonal> {
               const Text(
                 "Create New Task List",
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -52,23 +54,46 @@ class _HomePagePersonalState extends State<HomePagePersonal> {
                     fontSize: 14,
                     color: Colors.black45,
                   ),
-                  border: UnderlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
                   ),
-                  contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
                   filled: true,
                   fillColor: const Color.fromRGBO(191, 191, 191, 1),
                 ),
               ),
-              const SizedBox(height: 20),
-              const Text(
-                "Select Task Color",
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
+              const SizedBox(height: 10),
+              // Display the selected color
+              Container(
+                margin: const EdgeInsets.symmetric(vertical: 10),
+                width: double.infinity,
+                height: 45,
+                decoration: BoxDecoration(
+                  color: _isSelected ? selectedColor : defaultColor,  // Set the background color to the selected color
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: Colors.black.withOpacity(0.1),  // Optional border for better visibility
+                  ),
+                ),
+                child: ElevatedButton(
+                  onPressed: _colorOption,  // Open the color picker when clicked
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent, // Make button background transparent
+                    shadowColor: Colors.transparent, // Remove shadow
+                    padding: EdgeInsets.zero,  // Remove default padding
+                  ),
+                  child: const Text(
+                    "Select Task Color",
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
@@ -77,8 +102,12 @@ class _HomePagePersonalState extends State<HomePagePersonal> {
                       if (_taskController.text.isNotEmpty) {
                         setState(() {
                           // Add task text and selected color to list
-                          tasks.add(_taskController.text);
-                          _taskController.text = ''; // Clear the text field
+                          tasks.add({
+                            'task': _taskController.text,
+                            'color': selectedColor,
+                          });
+                          _isSelected = false;
+                          _taskController.clear(); // Clear the text field
                         });
                       }
                       Navigator.of(context).pop(); // Close the bottom sheet
@@ -87,9 +116,9 @@ class _HomePagePersonalState extends State<HomePagePersonal> {
                       backgroundColor: const Color.fromRGBO(123, 119, 148, 1),
                       foregroundColor: const Color.fromRGBO(245, 245, 245, 1),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 30),
+                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 30),
                     ),
                     child: const Text("Create"),
                   ),
@@ -107,13 +136,14 @@ class _HomePagePersonalState extends State<HomePagePersonal> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Pick a Color'),
           content: SingleChildScrollView(
             child: ColorPicker(
-              pickerColor: selectedColor,
+              pickerColor: _isSelected ? selectedColor : defaultColor,
               onColorChanged: (color) {
+                // Immediate color update using setState
                 setState(() {
-                  selectedColor = color;
+                  selectedColor = color;  // Update selected color
+                  _isSelected = true;      // Mark that a color has been selected
                 });
               },
               showLabel: true,
@@ -123,9 +153,12 @@ class _HomePagePersonalState extends State<HomePagePersonal> {
           actions: <Widget>[
             TextButton(
               onPressed: () {
+                setState(() {
+                  _isSelected = true; // Ensure that color change is applied immediately
+                });
                 Navigator.of(context).pop();  // Close the color picker dialog
               },
-              child: Text('Close'),
+              child: const Text('Close'),
             ),
           ],
         );
@@ -300,10 +333,15 @@ class _HomePagePersonalState extends State<HomePagePersonal> {
                       ),
                       itemCount: tasks.length,
                       itemBuilder: (context, index) {
-                        return TaskWidget(text: tasks[index]);
+                        // Access the 'task' and 'color' from the map at index
+                        String taskText = tasks[index]['task'];
+                        Color taskColor = tasks[index]['color'];
+
+                        return TaskWidget(text: taskText, color: taskColor);
                       },
                     ),
-                  ),
+                  )
+
                 ],
               ),
             ),

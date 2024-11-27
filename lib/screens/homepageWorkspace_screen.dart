@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:listify/screens/homepagePersonal_screen.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:listify/screens/homepageWorkspace_screen.dart';
 import 'package:listify/widgets/task_widget.dart';
 import '../models/user_model.dart';
@@ -14,12 +14,146 @@ class HomePageWorkspace extends StatefulWidget {
 }
 
 class _HomePageWorkspaceState extends State<HomePageWorkspace> {
+  final TextEditingController _taskController = TextEditingController();
   List<String> tasks = [];
+  Color selectedColor = const Color.fromRGBO(123, 119, 1, 1);
+
+  @override
+  void dispose() {
+    _taskController.dispose();
+    super.dispose();
+  }
 
   void addTask() {
-    setState(() {
-      tasks.add('New Task ${tasks.length + 1}');
-    });
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true, // Makes the bottom sheet dynamic
+      backgroundColor: const Color.fromRGBO(245, 245, 245, 1),
+      builder: (BuildContext context) {
+        return Padding(
+          padding: const EdgeInsets.all(20), // Padding around bottom sheet
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                "Create New Task List",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 20),
+              TextField(
+                controller: _taskController,
+                decoration: InputDecoration(
+                  hintText: "Enter task description",
+                  hintStyle: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.black45,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                  filled: true,
+                  fillColor: const Color.fromRGBO(191, 191, 191, 1),
+                ),
+              ),
+              const SizedBox(height: 10),
+              // Display the selected color
+              Container(
+                margin: const EdgeInsets.symmetric(vertical: 10),
+                width: double.infinity,
+                height: 45,
+                decoration: BoxDecoration(
+                  color: selectedColor,  // Set the background color to the selected color
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: Colors.black.withOpacity(0.1),  // Optional border for better visibility
+                  ),
+                ),
+                child: ElevatedButton(
+                  onPressed: _colorOption,  // Open the color picker when clicked
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent, // Make button background transparent
+                    shadowColor: Colors.transparent, // Remove shadow
+                    padding: EdgeInsets.zero,  // Remove default padding
+                  ),
+                  child: const Text(
+                    "Select Task Color",
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      if (_taskController.text.isNotEmpty) {
+                        setState(() {
+                          // Add task text and selected color to list
+                          tasks.add(_taskController.text);
+                          _taskController.clear(); // Clear the text field
+                        });
+                      }
+                      Navigator.of(context).pop(); // Close the bottom sheet
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromRGBO(123, 119, 148, 1),
+                      foregroundColor: const Color.fromRGBO(245, 245, 245, 1),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 30),
+                    ),
+                    child: const Text("Create"),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _colorOption() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Pick a Color'),
+          content: SingleChildScrollView(
+            child: ColorPicker(
+              pickerColor: selectedColor,
+              onColorChanged: (color) {
+                setState(() {
+                  selectedColor = color;
+                });
+              },
+              showLabel: true,
+              pickerAreaHeightPercent: 0.8,
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();  // Close the color picker dialog
+              },
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -108,6 +242,10 @@ class _HomePageWorkspaceState extends State<HomePageWorkspace> {
                   child: TextField(
                     decoration: InputDecoration(
                       hintText: "Search Task",
+                      hintStyle: const TextStyle(
+                        fontSize: 14,
+                        color: Colors.black45,
+                      ),
                       prefixIcon: const Icon(Icons.search, size: 20),
                       isDense: true,
                       contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 15),
@@ -125,22 +263,21 @@ class _HomePageWorkspaceState extends State<HomePageWorkspace> {
                   child: OutlinedButton(
                     onPressed: () {
                       Navigator.of(context).push(MaterialPageRoute(
-                          builder: (builder) => HomePagePersonal(user: widget.user)));
-
+                        builder: (builder) => HomePageWorkspace(user: widget.user),
+                      ));
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromRGBO(
-                          123, 119, 148, 1), // Background color
+                      backgroundColor: const Color.fromRGBO(123, 119, 148, 1),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(100),
                       ),
                       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 30),
                     ),
                     child: const Text(
-                      'Workspace',
+                      'Personal',
                       style: TextStyle(
                         color: Color.fromRGBO(245, 245, 245, 1),
-                        fontWeight: FontWeight.normal,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),
@@ -167,7 +304,7 @@ class _HomePageWorkspaceState extends State<HomePageWorkspace> {
                         ),
                       ),
                       IconButton(
-                        onPressed: addTask, // Panggil addTask saat ikon ditekan
+                        onPressed: addTask, // Calls addTask when icon is pressed
                         icon: const Icon(
                           Icons.add_circle_outline,
                           color: Color.fromRGBO(245, 245, 245, 1),
@@ -185,7 +322,7 @@ class _HomePageWorkspaceState extends State<HomePageWorkspace> {
                       ),
                       itemCount: tasks.length,
                       itemBuilder: (context, index) {
-                        return TaskWidget(text: tasks[index]);
+                        return TaskWidget(text: tasks[index], color: selectedColor,);
                       },
                     ),
                   ),
