@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
 class TaskWidget extends StatelessWidget {
-  const TaskWidget({super.key, required this.index});
+  const TaskWidget({super.key, required this.text, required this.color});
 
-  final int index;
+  final String text;
+  final Color color;
 
   @override
   Widget build(BuildContext context) {
@@ -11,18 +12,18 @@ class TaskWidget extends StatelessWidget {
       width: 120, // Lebar container
       height: 120, // Tinggi container
       decoration: BoxDecoration(
-        color: const Color.fromRGBO(123, 119, 148, 1), // Warna latar menyerupai gambar
+        color: color, // Warna latar menyerupai gambar
         borderRadius: BorderRadius.circular(10.0), // Sudut melengkung
       ),
       child: Stack(
         children: [
-          const Center(
+          Center(
             child: Padding(
-              padding: EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8.0),
               child: Text(
-                "Kalkulus", // Teks utama
+                text, // Teks utama
                 textAlign: TextAlign.center, // Teks di tengah
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 18.0,
                   color: Colors.white, // Warna teks putih
                   fontWeight: FontWeight.bold,
@@ -33,10 +34,13 @@ class TaskWidget extends StatelessWidget {
           Positioned(
             top: 5, // Jarak dari atas
             right: 0, // Jarak dari kanan
-            child:  IconButton(icon: const Icon(Icons.more_vert, // Ikon titik tiga
-              size: 20, // Ukuran ikon sesuai gambar
-              color: Colors.black, ),
-              onPressed: (){
+            child:  IconButton(
+              icon: const Icon(
+                Icons.more_vert, // Ikon titik tiga
+                size: 20, // Ukuran ikon sesuai gambar
+                color: Colors.black,
+              ),
+              onPressed: () {
                 showDialog(
                   context: context,
                   builder: (BuildContext context) {
@@ -71,10 +75,9 @@ class TaskWidget extends StatelessWidget {
                     );
                   },
                 );
-
-              },// Warna ikon hitam
-              ),
+              },
             ),
+          ),
         ],
       ),
     );
