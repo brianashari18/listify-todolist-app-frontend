@@ -1,4 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:listify/screens/verification_screen.dart';
+
+import '../services/api_service.dart';
 
 class ForgetPasswordScreen extends StatefulWidget {
   const ForgetPasswordScreen({super.key});
@@ -20,21 +25,50 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
 
   bool _isValidEmail(String email) {
     final RegExp emailRegex =
-    RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+        RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
     return emailRegex.hasMatch(email);
   }
 
-  void _handleContinue() {
+  void _handleContinue() async {
     final email = _emailController.text.trim();
     if (_isValidEmail(email)) {
       setState(() {
         _emailError = null;
       });
-      // Handle valid email logic (e.g., API call)
-      print("Email is valid: $email");
+      try {
+        final requestBody = <String, dynamic>{
+          "email": email,
+        };
+
+        final response = await ApiService.forgotPassword(
+            "/api/users/forgot-password", requestBody);
+
+        if (response.statusCode == 200) {
+          final Map<String, dynamic> responseBody = jsonDecode(response.body);
+          print("Response: $responseBody");
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text(responseBody["message"])));
+
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => VerificationScreen(
+                    email: email,
+                  )));
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Email is not exists")),
+          );
+          print("Error: ${response.body}");
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("$e.")),
+        );
+        print("Exception: $e");
+      }
     } else {
       setState(() {
         _emailError = 'Please enter a valid email address';
+        FocusScope.of(context).requestFocus(FocusNode());
       });
     }
   }
@@ -75,19 +109,13 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
                 height: 350,
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 16.0),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 32.0, vertical: 16.0),
                 child: Column(
                   children: [
                     Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Colors.black26, // Warna bayangan
-                            blurRadius: 6,         // Intensitas blur bayangan
-                            offset: Offset(0, 8),  // Posisi bayangan (x, y)
-                          ),
-                        ],
                       ),
                       child: TextField(
                         controller: _emailController,
@@ -97,7 +125,18 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
                             fontSize: 14,
                             color: Colors.black45,
                           ),
-                          errorText: _emailError, // Tampilkan pesan error jika ada
+                          errorStyle: const TextStyle(
+                            color: Colors.red,
+                            shadows: [
+                              Shadow(
+                                offset: Offset(0.3, 0.3),
+                                blurRadius: 2.0,
+                                color: Colors.red,
+                              ),
+                            ],
+                          ),
+                          errorText: _emailError,
+                          // Tampilkan pesan error jika ada
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
@@ -109,12 +148,13 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
                     const SizedBox(height: 15),
                     SizedBox(
                       width: double.infinity,
-                      child: OutlinedButton(
+                      child: ElevatedButton(
                         onPressed: () {
-                          // Handle sign up action
+                          _handleContinue();
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color.fromRGBO(68, 64, 77, 1), // Background color
+                          backgroundColor: const Color.fromRGBO(30, 30, 42, 1),
+                          // Background color
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'dart:convert';
 import 'package:listify/screens/homepagePersonal_screen.dart';
 
@@ -16,8 +15,6 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   String? _emailError;
   bool _obscurePassword = true;
@@ -161,40 +158,6 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ],
     );
-  }
-
-  Future<void> _signInWithGoogle() async {
-    try {
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-
-      if (googleUser == null) {
-        // Jika login dibatalkan oleh pengguna
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Google Sign-In canceled")),
-        );
-        return;
-      }
-
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
-
-      // Ambil token untuk dikirim ke backend atau digunakan untuk otentikasi Firebase
-      final String? idToken = googleAuth.idToken;
-      final String? accessToken = googleAuth.accessToken;
-
-      print("Google Sign-In successful");
-      print("ID Token: $idToken");
-      print("Access Token: $accessToken");
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Welcome ${googleUser.displayName}!")),
-      );
-    } catch (error) {
-      print("Google Sign-In failed: $error");
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Google Sign-In failed")),
-      );
-    }
   }
 
   @override
@@ -383,7 +346,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 15),
                   GestureDetector(
-                    onTap: _signInWithGoogle,
+                    onTap: (){},
                     child: Image.asset(
                       'assets/icons/google.png',
                       height: 40,

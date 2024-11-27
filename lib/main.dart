@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
-      home: HomePagePersonal(user: User(id: 1, username: 'test', email: 'test@example.com')),
+      home: const StartScreen(),
     );
   }
 }
