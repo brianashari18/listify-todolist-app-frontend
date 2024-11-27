@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'dart:convert';
-import 'package:listify/screens/homepage.dart';
+import 'package:listify/screens/homepagePersonal_screen.dart';
 
 import '../models/user_model.dart';
 import '../services/api_service.dart';
@@ -105,8 +105,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
             Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute(
-                    builder: (context) => HomePage(
-                          title: 'User',
+                    builder: (context) => HomePagePersonal(
                           user: user,
                         )),
                 (Route<dynamic> route) => false);
