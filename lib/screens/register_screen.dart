@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'dart:convert'; // Untuk mengubah data ke format JSON
 import 'package:http/http.dart' as http;
+import 'package:listify/screens/login_screen.dart';
+import 'package:listify/services/api_service.dart';
 
-class RegisterScreen extends StatefulWidget{
+class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
 
   @override
@@ -81,7 +83,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
       }
     });
 
-    if (password != confirmPassword) {  // Check if passwords match
+    if (password != confirmPassword) {
+      // Check if passwords match
       _confirmPasswordError = 'Passwords do not match';
       FocusScope.of(context).requestFocus(FocusNode());
     }
@@ -98,30 +101,33 @@ class _RegisterScreenState extends State<RegisterScreen> {
         _hasSpecialCharacter) {
       // Jika validasi berhasil, kirim data ke backend
       try {
-        final responseInput = await http.post(
-          Uri.parse("http://localhost:8080/api/users/register"),
-          headers: {"Content-Type": "application/json"},
-          body: jsonEncode({
-            "username": username,
-            "email": email,
-            "password": password
-          }),
-        );
+        final requestBody = <String, dynamic>{
+          "username": username,
+          "email": email,
+          "password": password,
+          "confirmPassword": confirmPassword
+        };
+        final responseInput =
+        await ApiService.register("/api/users", requestBody);
 
         if (responseInput.statusCode == 200) {
-          // Login berhasil
-          final responseData = jsonDecode(responseInput.body);
-          final message = responseData['message']?? 'Login successful';
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Login Successful: $message")),
+            const SnackBar(content: Text("Registrasi Successful")),
           );
+
           print("Response: ${responseInput.body}");
+
+          if (!context.mounted) {
+            return;
+          }
+
+          Navigator.of(context).push(
+              MaterialPageRoute(builder: (builder) => const LoginScreen()));
         } else {
-          // Login gagal
+          // Registrasi gagal
           final responseData = jsonDecode(responseInput.body);
-          final error = responseData['error']?? 'Unknown error';
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Login Failed: $error")),
+            SnackBar(content: Text("Registrasi Failed")),
           );
           print("Error: ${responseInput.body}");
         }
@@ -132,7 +138,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         print("Exception: $e");
       }
     } else {
-      print('Login Failed');
+      print('Registrasi Failed');
     }
   }
 
@@ -140,17 +146,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return Row(
       children: [
         Icon(
-          isValid? Icons.check_circle : Icons.cancel,
-          color: isValid? Colors.green : Colors.red,
+          isValid ? Icons.check_circle : Icons.cancel,
+          color: isValid ? Colors.green : Colors.red,
           size: 20,
         ),
         const SizedBox(width: 8),
         Text(
           text,
           style: TextStyle(
-            color: isValid? Colors.green : Colors.red,
+            color: isValid ? Colors.green : Colors.red,
             fontSize: 14,
-            fontWeight: isValid? FontWeight.w600 : FontWeight.normal,
+            fontWeight: isValid ? FontWeight.w600 : FontWeight.normal,
           ),
         ),
       ],
@@ -169,14 +175,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
         return;
       }
 
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth =
+      await googleUser.authentication;
 
       // Get the tokens for backend or Firebase authentication
       final String? idToken = googleAuth.idToken;
       final String? accessToken = googleAuth.accessToken;
 
       final responseGoogle = await http.post(
-        Uri.parse("http://localhost:8080/api/users/register"), // Use HTTPS for security
+        Uri.parse("http://localhost:8080/api/users/register"),
+        // Use HTTPS for security
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
           "username": googleUser.displayName,
@@ -260,7 +268,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           fontSize: 14,
                           color: Color.fromRGBO(51, 51, 51, 1),
                         ),
-                        errorText: _usernameError, // Tampilkan pesan error jika ada
+                        errorText: _usernameError,
+                        // Tampilkan pesan error jika ada
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
@@ -282,7 +291,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           fontSize: 14,
                           color: Color.fromRGBO(51, 51, 51, 1),
                         ),
-                        errorText: _emailError, // Tampilkan pesan error jika ada
+                        errorText: _emailError,
+                        // Tampilkan pesan error jika ada
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
@@ -332,25 +342,31 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: TextField(
-                      controller: _confirmPassController,  // Use the controller for confirm password
-                      obscureText: _obscureConfirmPassword,    // Use separate visibility for confirm password
+                      controller: _confirmPassController,
+                      // Use the controller for confirm password
+                      obscureText: _obscureConfirmPassword,
+                      // Use separate visibility for confirm password
                       decoration: InputDecoration(
                         labelText: 'Confirm Password',
                         labelStyle: const TextStyle(
                           fontSize: 14,
                           color: Color.fromRGBO(51, 51, 51, 1),
                         ),
-                        errorText: _confirmPasswordError,  // Display error message if passwords do not match
+                        errorText: _confirmPasswordError,
+                        // Display error message if passwords do not match
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
                         suffixIcon: IconButton(
                           icon: Icon(
-                            _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
+                            _obscureConfirmPassword
+                                ? Icons.visibility_off
+                                : Icons.visibility,
                           ),
                           onPressed: () {
                             setState(() {
-                              _obscureConfirmPassword = !_obscureConfirmPassword;
+                              _obscureConfirmPassword =
+                              !_obscureConfirmPassword;
                             });
                           },
                         ),
@@ -411,7 +427,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     alignment: Alignment.center,
                     child: InkWell(
                       onTap: () {
-                        // Tambahkan aksi untuk pendaftaran akun baru
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (builder) => const LoginScreen()));
                       },
                       splashColor: Colors.transparent,
                       highlightColor: Colors.transparent,
@@ -419,7 +436,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 12, vertical: 6),
                         child: const Text(
-                          'Create new account',
+                          'Already have an account',
                           style: TextStyle(
                             color: Color.fromRGBO(68, 64, 77, 1),
                             fontSize: 14,
@@ -431,9 +448,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   const SizedBox(height: 20),
                   const Text(
                     'Or continue with',
-                    style: TextStyle(
-                        color: Color.fromRGBO(68, 64, 77, 1)
-                    ),
+                    style: TextStyle(color: Color.fromRGBO(68, 64, 77, 1)),
                   ),
                   const SizedBox(height: 15),
                   GestureDetector(

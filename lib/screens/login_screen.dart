@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'dart:convert'; // Untuk mengubah data ke format JSON
-import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:listify/screens/homepage.dart';
+
+import '../models/user_model.dart';
+import '../services/api_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -33,7 +36,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   bool _isValidEmail(String email) {
     final RegExp emailRegex =
-    RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+        RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
     return emailRegex.hasMatch(email);
   }
 
@@ -70,32 +73,68 @@ class _LoginScreenState extends State<LoginScreen> {
         _hasSpecialCharacter) {
       // Jika validasi berhasil, kirim data ke backend
       try {
-        final response = await http.post(
-          Uri.parse("http://localhost:8080/api/users/login"),
-          headers: {"Content-Type": "application/json"},
-          body: jsonEncode({"email": email, "password": password}),
-        );
+        final requestBody = <String, dynamic>{
+          "email": email,
+          "password": password,
+        };
+        final response =
+            await ApiService.login("/api/users/login", requestBody);
 
         if (response.statusCode == 200) {
           // Login berhasil
-          final responseData = jsonDecode(response.body);
-          final message = responseData['message']?? 'Login successful';
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Login Successful: $message")),
-          );
-          print("Response: ${response.body}");
+          ScaffoldMessenger.of(context)
+              .showSnackBar(const SnackBar(content: Text("Login Successful")));
+
+          final Map<String, dynamic> responseBody = jsonDecode(response.body);
+          print("Response: $responseBody");
+
+          final accessToken = responseBody['data']['token'];
+          final responseUser =
+              await ApiService.getCurrent("/api/users/current", accessToken);
+
+          if (responseUser.statusCode == 200) {
+            final Map<String, dynamic> responseData =
+                jsonDecode(responseUser.body);
+            final data = responseData["data"];
+            print("User data: $data");
+
+            User user = User(
+                id: data["id"],
+                username: data["username"],
+                email: data["email"]);
+
+            Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(
+                    builder: (context) => HomePage(
+                          title: 'User',
+                          user: user,
+                        )),
+                (Route<dynamic> route) => false);
+          } else if (responseUser.statusCode == 401) {
+            // Jika status code 401 (Unauthorized), artinya akses token tidak valid atau telah kedaluwarsa
+            print("Unauthorized access. Please login again.");
+            // Arahkan ke layar login atau tampilkan pesan kesalahan
+          } else if (responseUser.statusCode == 404) {
+            // Jika status code 404 (Not Found), artinya endpoint tidak ditemukan
+            print("User not found.");
+          } else if (responseUser.statusCode == 500) {
+            // Jika status code 500 (Internal Server Error), artinya ada masalah di server
+            print("Internal server error. Please try again later.");
+          } else {
+            // Menangani status code lain yang mungkin terjadi
+            print(
+                "Unexpected error occurred. Status code: ${responseUser.statusCode}");
+          }
         } else {
           // Login gagal
-          final responseData = jsonDecode(response.body);
-          final error = responseData['error']?? 'Unknown error';
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Login Failed: $error")),
+            const SnackBar(content: Text("Login Failed")),
           );
           print("Error: ${response.body}");
         }
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("An error occurred. Please try again.")),
+          SnackBar(content: Text("$e.")),
         );
         print("Exception: $e");
       }
@@ -108,17 +147,17 @@ class _LoginScreenState extends State<LoginScreen> {
     return Row(
       children: [
         Icon(
-          isValid? Icons.check_circle : Icons.cancel,
-          color: isValid? Colors.green : Colors.red,
+          isValid ? Icons.check_circle : Icons.cancel,
+          color: isValid ? Colors.green : Colors.red,
           size: 20,
         ),
         const SizedBox(width: 8),
         Text(
           text,
           style: TextStyle(
-            color: isValid? Colors.green : Colors.red,
+            color: isValid ? Colors.green : Colors.red,
             fontSize: 14,
-            fontWeight: isValid? FontWeight.w600 : FontWeight.normal,
+            fontWeight: isValid ? FontWeight.w600 : FontWeight.normal,
           ),
         ),
       ],
@@ -138,7 +177,7 @@ class _LoginScreenState extends State<LoginScreen> {
       }
 
       final GoogleSignInAuthentication googleAuth =
-      await googleUser.authentication;
+          await googleUser.authentication;
 
       // Ambil token untuk dikirim ke backend atau digunakan untuk otentikasi Firebase
       final String? idToken = googleAuth.idToken;
@@ -202,7 +241,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           fontSize: 14,
                           color: Color.fromRGBO(51, 51, 51, 1),
                         ),
-                        errorText: _emailError, // Tampilkan pesan error jika ada
+                        errorText: _emailError,
+                        // Tampilkan pesan error jika ada
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
@@ -340,9 +380,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 50),
                   const Text(
                     'Or continue with',
-                    style: TextStyle(
-                        color: Color.fromRGBO(68, 64, 77, 1)
-                    ),
+                    style: TextStyle(color: Color.fromRGBO(68, 64, 77, 1)),
                   ),
                   const SizedBox(height: 15),
                   GestureDetector(

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:listify/screens/login_screen.dart';
+import 'package:listify/screens/register_screen.dart';
+import 'package:listify/widgets/carousel_widget.dart';
 
-class StartScreen extends StatefulWidget{
+class StartScreen extends StatefulWidget {
   const StartScreen({super.key});
 
   @override
@@ -10,48 +13,47 @@ class StartScreen extends StatefulWidget{
 class _StartScreenState extends State<StartScreen> {
   @override
   Widget build(BuildContext context) {
+    final deviceHeight = MediaQuery.of(context).size.height;
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 85, horizontal: 24),
-        child: Center(
+        body: Container(
+          height: deviceHeight,
+          padding: const EdgeInsets.symmetric(vertical: 85, horizontal: 24),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Spacer(),
-                    Image.asset(
-                      'assets/images/login/login1.png', // Replace with your image asset path
-                      height: 350,
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(height: deviceHeight - deviceHeight * 0.94),
+                  const CarouselWidget(),
+                  const SizedBox(height: 20),
+                  const Text(
+                    'Manage your activities and\ncreate reminders',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                      color: Color.fromRGBO(245, 245, 245, 1),
                     ),
-                    const SizedBox(height: 20),
-                    const Text(
-                      'Manage your activities and\ncreate reminders',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w500,
-                        color: Color.fromRGBO(245, 245, 245, 1),
-                      ),
-                    ),
-                    const Spacer(),
-                  ],
-                ),
+                  ),
+                ],
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 16.0),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 32.0, vertical: 16.0),
                 child: Column(
                   children: [
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () {
-                          // Handle sign in action
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (builder) => const LoginScreen()));
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color.fromRGBO(30, 30, 42, 1), // Background color
+                          backgroundColor: const Color.fromRGBO(
+                              30, 30, 42, 1), // Background color
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -71,10 +73,12 @@ class _StartScreenState extends State<StartScreen> {
                       width: double.infinity,
                       child: OutlinedButton(
                         onPressed: () {
-                          // Handle sign up action
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (builder) => const RegisterScreen()));
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color.fromRGBO(245, 245, 245, 1), // Background color
+                          backgroundColor: const Color.fromRGBO(
+                              245, 245, 245, 1), // Background color
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -95,8 +99,8 @@ class _StartScreenState extends State<StartScreen> {
             ],
           ),
         ),
-      ),
-      backgroundColor: const Color.fromRGBO(68, 64, 77, 1) // Background color similar to the image
-    );
+        backgroundColor: const Color.fromRGBO(
+            68, 64, 77, 1) // Background color similar to the image
+        );
   }
 }
