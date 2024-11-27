@@ -27,7 +27,7 @@ class _StartScreenState extends State<StartScreen> {
                 children: [
                   SizedBox(height: deviceHeight - deviceHeight * 0.94),
                   const CarouselWidget(),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 10),
                   const Text(
                     'Manage your activities and\ncreate reminders',
                     textAlign: TextAlign.center,
@@ -68,7 +68,7 @@ class _StartScreenState extends State<StartScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 30),
+                    const SizedBox(height: 20),
                     SizedBox(
                       width: double.infinity,
                       child: OutlinedButton(
