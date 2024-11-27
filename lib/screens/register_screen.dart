@@ -124,7 +124,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           // Registrasi gagal
           final responseData = jsonDecode(responseInput.body);
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Registrasi Failed")),
+            const SnackBar(content: Text("Registrasi Failed")),
           );
           print("Error: ${responseInput.body}");
         }

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 class TaskWidget extends StatelessWidget {
-  const TaskWidget({super.key, required this.index});
+  const TaskWidget({super.key, required this.text});
 
-  final int index;
+  final String text;
 
   @override
   Widget build(BuildContext context) {
@@ -16,13 +16,13 @@ class TaskWidget extends StatelessWidget {
       ),
       child: Stack(
         children: [
-          const Center(
+          Center(
             child: Padding(
-              padding: EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8.0),
               child: Text(
-                "Kalkulus", // Teks utama
+                text, // Teks utama
                 textAlign: TextAlign.center, // Teks di tengah
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 18.0,
                   color: Colors.white, // Warna teks putih
                   fontWeight: FontWeight.bold,
@@ -33,9 +33,12 @@ class TaskWidget extends StatelessWidget {
           Positioned(
             top: 5, // Jarak dari atas
             right: 0, // Jarak dari kanan
-            child:  IconButton(icon: const Icon(Icons.more_vert, // Ikon titik tiga
-              size: 20, // Ukuran ikon sesuai gambar
-              color: Colors.black, ),
+            child:  IconButton(
+              icon: const Icon(
+                Icons.more_vert, // Ikon titik tiga
+                size: 20, // Ukuran ikon sesuai gambar
+                color: Colors.black,
+              ),
               onPressed: (){
                 showDialog(
                   context: context,
@@ -71,10 +74,9 @@ class TaskWidget extends StatelessWidget {
                     );
                   },
                 );
-
               },// Warna ikon hitam
-              ),
             ),
+          ),
         ],
       ),
     );
