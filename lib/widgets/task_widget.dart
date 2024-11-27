@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
 class TaskWidget extends StatelessWidget {
-  const TaskWidget({super.key, required this.text});
+  const TaskWidget({super.key, required this.text, required this.color});
 
   final String text;
+  final Color color;
 
   @override
   Widget build(BuildContext context) {
@@ -11,7 +12,7 @@ class TaskWidget extends StatelessWidget {
       width: 120, // Lebar container
       height: 120, // Tinggi container
       decoration: BoxDecoration(
-        color: const Color.fromRGBO(123, 119, 148, 1), // Warna latar menyerupai gambar
+        color: color, // Warna latar menyerupai gambar
         borderRadius: BorderRadius.circular(10.0), // Sudut melengkung
       ),
       child: Stack(
@@ -39,7 +40,7 @@ class TaskWidget extends StatelessWidget {
                 size: 20, // Ukuran ikon sesuai gambar
                 color: Colors.black,
               ),
-              onPressed: (){
+              onPressed: () {
                 showDialog(
                   context: context,
                   builder: (BuildContext context) {
@@ -74,7 +75,7 @@ class TaskWidget extends StatelessWidget {
                     );
                   },
                 );
-              },// Warna ikon hitam
+              },
             ),
           ),
         ],
