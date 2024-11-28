@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  static const baseUrl = "http://192.168.137.1:8080";
+  static const baseUrl = "http://192.168.18.11:8080";
   static Future<http.Response> register(String url, Map<String, dynamic> requestBody) {
     return http.post(
       Uri.parse("$baseUrl$url"),
