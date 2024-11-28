@@ -69,6 +69,9 @@ flutter:
     - assets/images/forgetPass.png
     - assets/icons/google.png
     - assets/images/aboutt.png
+    - assets/images/help.png
+    - assets/images/feedback.png
+    - assets/images/faq.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

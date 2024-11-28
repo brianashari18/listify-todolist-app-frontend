@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:listify/screens/about_screen.dart';
 import 'package:listify/screens/forgetPassword_Screen.dart';
+import 'package:listify/screens/helpCenter_screen.dart';
 import 'package:listify/screens/homepagePersonal_screen.dart';
 import 'package:listify/screens/homepageWorkspace_screen.dart';
 import 'package:listify/screens/login_screen.dart';
@@ -27,7 +28,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
-      home:AboutPage(),
+      home: HelpCenter(),
     );
   }
 }
