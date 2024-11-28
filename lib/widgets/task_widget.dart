@@ -34,7 +34,6 @@ class TaskWidget extends StatelessWidget {
               ),
             ),
           ),
-
           // Posisi ikon titik tiga
           Positioned(
             top: 8, // Menyesuaikan posisi vertikal

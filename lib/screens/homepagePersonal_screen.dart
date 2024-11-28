@@ -19,6 +19,8 @@ class _HomePagePersonalState extends State<HomePagePersonal> {
   Color defaultColor = const Color.fromRGBO(123, 119, 148, 1);
   Color selectedColor = const Color.fromRGBO(123, 119, 148, 1);
   bool _isSelected = false;
+  int? _editingTaskIndex;
+
 
   @override
   void dispose() {
@@ -131,6 +133,128 @@ class _HomePagePersonalState extends State<HomePagePersonal> {
     );
   }
 
+  void editTask(int index){
+    setState(() {
+      _editingTaskIndex = index;
+      _taskController.text = tasks[index]['task'];
+      selectedColor = tasks[index]['color'];
+      _isSelected = true; // Mark that a task is being edited
+    });
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true, // Makes the bottom sheet dynamic
+      backgroundColor: const Color.fromRGBO(245, 245, 245, 1),
+      builder: (BuildContext context) {
+        return Padding(
+          padding: const EdgeInsets.all(20), // Padding around bottom sheet
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                "Edit Task List",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 20),
+              TextField(
+                controller: _taskController,
+                decoration: InputDecoration(
+                  hintText: "Enter task description",
+                  hintStyle: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.black45,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                  filled: true,
+                  fillColor: const Color.fromRGBO(191, 191, 191, 1),
+                ),
+              ),
+              const SizedBox(height: 10),
+              // Display the selected color
+              Container(
+                margin: const EdgeInsets.symmetric(vertical: 10),
+                width: double.infinity,
+                height: 45,
+                decoration: BoxDecoration(
+                  color: _isSelected ? selectedColor : defaultColor,  // Set the background color to the selected color
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: Colors.black.withOpacity(0.1),  // Optional border for better visibility
+                  ),
+                ),
+                child: ElevatedButton(
+                  onPressed: _colorOption,  // Open the color picker when clicked
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent, // Make button background transparent
+                    shadowColor: Colors.transparent, // Remove shadow
+                    padding: EdgeInsets.zero,  // Remove default padding
+                  ),
+                  child: const Text(
+                    "Select Task Color",
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      if (_taskController.text.isNotEmpty) {
+                        setState(() {
+                          // Check if editing an existing task
+                          if (_editingTaskIndex != null) {
+                            // Update the existing task
+                            tasks[_editingTaskIndex!] = {
+                              'task': _taskController.text,
+                              'color': selectedColor,
+                            };
+                          } else {
+                            // Add new task
+                            tasks.add({
+                              'task': _taskController.text,
+                              'color': selectedColor,
+                            });
+                          }
+                          _isSelected = false;
+                          _taskController.clear();
+                          _editingTaskIndex = null; // Reset editing index
+                        });
+                      }
+                      Navigator.of(context).pop(); // Close the bottom sheet
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromRGBO(123, 119, 148, 1),
+                      foregroundColor: const Color.fromRGBO(245, 245, 245, 1),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 30),
+                    ),
+                    child: const Text("Save"),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   void _colorOption() {
     showDialog(
       context: context,
@@ -165,7 +289,6 @@ class _HomePagePersonalState extends State<HomePagePersonal> {
       },
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -333,15 +456,17 @@ class _HomePagePersonalState extends State<HomePagePersonal> {
                       ),
                       itemCount: tasks.length,
                       itemBuilder: (context, index) {
-                        // Access the 'task' and 'color' from the map at index
                         String taskText = tasks[index]['task'];
                         Color taskColor = tasks[index]['color'];
-
-                        return TaskWidget(text: taskText, color: taskColor);
+                        return GestureDetector(
+                          onTap: () {
+                            editTask(index); // Pass the task index for editing
+                          },
+                          child: TaskWidget(text: taskText, color: taskColor),
+                        );
                       },
                     ),
-                  )
-
+                  ),
                 ],
               ),
             ),
