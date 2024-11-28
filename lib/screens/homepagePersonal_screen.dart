@@ -1,8 +1,11 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:listify/screens/homepageWorkspace_screen.dart';
+import 'package:listify/widgets/side_drawer.dart';
 import 'package:listify/widgets/task_widget.dart';
 import '../models/user_model.dart';
+import '../services/api_service.dart';
 
 class HomePagePersonal extends StatefulWidget {
   const HomePagePersonal({super.key, required this.user});
@@ -15,12 +18,20 @@ class HomePagePersonal extends StatefulWidget {
 
 class _HomePagePersonalState extends State<HomePagePersonal> {
   final TextEditingController _taskController = TextEditingController();
+
   List<Map<String, dynamic>> tasks = [];
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   Color defaultColor = const Color.fromRGBO(123, 119, 148, 1);
   Color selectedColor = const Color.fromRGBO(123, 119, 148, 1);
   bool _isSelected = false;
   int? _editingTaskIndex;
 
+  @override
+  void initState() {
+    super.initState();
+    getTask();
+  }
 
   @override
   void dispose() {
@@ -28,7 +39,37 @@ class _HomePagePersonalState extends State<HomePagePersonal> {
     super.dispose();
   }
 
-  void addTask() {
+  void addTask() async{
+    try {
+      final requestBody = <String, dynamic>{
+        "name" : _taskController.text,
+        "color" : selectedColor
+      };
+      final responseInput =
+          await ApiService.addTask("/api/tasks", requestBody);
+
+      if (responseInput.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Add Task Successful")),
+        );
+
+        print("Response: ${responseInput.body}");
+
+      } else {
+        // Registrasi gagal
+        final responseData = jsonDecode(responseInput.body);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Add Task Failed")),
+        );
+        print("Error: ${responseInput.body}");
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("An error occurred. Please try again.")),
+      );
+      print("Exception: $e");
+    }
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true, // Makes the bottom sheet dynamic
@@ -133,7 +174,8 @@ class _HomePagePersonalState extends State<HomePagePersonal> {
     );
   }
 
-  void editTask(int index){
+  void editTask(int index) {
+    // Set the task index being edited
     setState(() {
       _editingTaskIndex = index;
       _taskController.text = tasks[index]['task'];
@@ -141,13 +183,15 @@ class _HomePagePersonalState extends State<HomePagePersonal> {
       _isSelected = true; // Mark that a task is being edited
     });
 
+    print('test');
+    // Show the bottom sheet
     showModalBottomSheet(
       context: context,
-      isScrollControlled: true, // Makes the bottom sheet dynamic
+      isScrollControlled: true,
       backgroundColor: const Color.fromRGBO(245, 245, 245, 1),
       builder: (BuildContext context) {
         return Padding(
-          padding: const EdgeInsets.all(20), // Padding around bottom sheet
+          padding: const EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
@@ -184,18 +228,18 @@ class _HomePagePersonalState extends State<HomePagePersonal> {
                 width: double.infinity,
                 height: 45,
                 decoration: BoxDecoration(
-                  color: _isSelected ? selectedColor : defaultColor,  // Set the background color to the selected color
+                  color: _isSelected ? selectedColor : defaultColor,
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
-                    color: Colors.black.withOpacity(0.1),  // Optional border for better visibility
+                    color: Colors.black.withOpacity(0.1),
                   ),
                 ),
                 child: ElevatedButton(
-                  onPressed: _colorOption,  // Open the color picker when clicked
+                  onPressed: _colorOption,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.transparent, // Make button background transparent
-                    shadowColor: Colors.transparent, // Remove shadow
-                    padding: EdgeInsets.zero,  // Remove default padding
+                    backgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                    padding: EdgeInsets.zero,
                   ),
                   child: const Text(
                     "Select Task Color",
@@ -290,9 +334,60 @@ class _HomePagePersonalState extends State<HomePagePersonal> {
     );
   }
 
+  void getTask() async {
+    try {
+      final responseInput =
+          await ApiService.getTask("/api/users/${widget.user}/tasks");
+
+      if (responseInput.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Retrieve Successful")),
+        );
+        print("Response: ${responseInput.body}");
+
+        // Sample response body (already decoded)
+        final Map<String, dynamic> responseBody = jsonDecode(responseInput.body);
+
+// Extracting the "data" field (which is a list of maps)
+        final List<dynamic> data = responseBody["data"];
+
+// Initialize an empty list to hold the transformed tasks
+        List<Map<String, dynamic>> tasks = [];
+
+// Mapping the data to a new structure and adding to tasks
+        data.map((item) {
+          tasks.add({
+            "text": item["name"],    // You can adjust the mapping as needed
+            "color": item["color"],  // Example of mapping another field
+            "isShared": item["isShared"], // Another field from the data
+            // You can add more fields here if needed
+          });
+        });
+
+// Now the tasks list contains the transformed data
+        print(tasks);
+      } else {
+
+        final responseData = jsonDecode(responseInput.body);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Registrasi Failed")),
+        );
+        print("Error: ${responseInput.body}");
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("An error occurred. Please try again.")),
+      );
+      print("Exception: $e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: const SideDrawer(),
+      key: _scaffoldKey,
+      endDrawerEnableOpenDragGesture: false,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: const Color.fromRGBO(68, 64, 77, 1),
@@ -306,11 +401,16 @@ class _HomePagePersonalState extends State<HomePagePersonal> {
                 color: Color.fromRGBO(245, 245, 245, 1),
                 shape: BoxShape.circle,
               ),
-              child: const Center(
-                child: Icon(
-                  Icons.menu,
-                  size: 20,
-                  color: Color.fromRGBO(68, 64, 77, 1),
+              child: Center(
+                child: IconButton(
+                  icon: const Icon(
+                    Icons.menu,
+                    size: 20,
+                    color: Color.fromRGBO(68, 64, 77, 1),
+                  ),
+                  onPressed: (){
+                    _scaffoldKey.currentState!.openDrawer();
+                  },
                 ),
               ),
             ),
@@ -354,7 +454,9 @@ class _HomePagePersonalState extends State<HomePagePersonal> {
                   size: 20,
                   color: Color.fromRGBO(68, 64, 77, 1),
                 ),
-                onPressed: () {},
+                onPressed: () {
+
+                },
               ),
             ),
           ),
@@ -397,7 +499,7 @@ class _HomePagePersonalState extends State<HomePagePersonal> {
                   child: OutlinedButton(
                     onPressed: () {
                       Navigator.of(context).push(MaterialPageRoute(
-                        builder: (builder) => HomePageWorkspace(user: widget.user),
+                          builder: (builder) => HomePageWorkspace(user: widget.user),
                       ));
                     },
                     style: ElevatedButton.styleFrom(
@@ -458,12 +560,9 @@ class _HomePagePersonalState extends State<HomePagePersonal> {
                       itemBuilder: (context, index) {
                         String taskText = tasks[index]['task'];
                         Color taskColor = tasks[index]['color'];
-                        return GestureDetector(
-                          onTap: () {
-                            editTask(index); // Pass the task index for editing
-                          },
-                          child: TaskWidget(text: taskText, color: taskColor),
-                        );
+                        return TaskWidget(text: taskText, color: taskColor, index: index,onEdit: (index) {
+                          editTask(index);
+                        },);
                       },
                     ),
                   ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
-import 'package:listify/screens/homepageWorkspace_screen.dart';
+import 'package:listify/screens/homepagePersonal_screen.dart';
+import 'package:listify/widgets/side_drawer.dart';
 import 'package:listify/widgets/task_widget.dart';
 import '../models/user_model.dart';
 
@@ -15,10 +16,14 @@ class HomePageWorkspace extends StatefulWidget {
 
 class _HomePageWorkspaceState extends State<HomePageWorkspace> {
   final TextEditingController _taskController = TextEditingController();
+
   List<Map<String, dynamic>> tasks = [];
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   Color defaultColor = const Color.fromRGBO(123, 119, 148, 1);
   Color selectedColor = const Color.fromRGBO(123, 119, 148, 1);
   bool _isSelected = false;
+  int? _editingTaskIndex;
 
   @override
   void dispose() {
@@ -131,6 +136,131 @@ class _HomePageWorkspaceState extends State<HomePageWorkspace> {
     );
   }
 
+  void editTask(int index) {
+    // Set the task index being edited
+    setState(() {
+      _editingTaskIndex = index;
+      _taskController.text = tasks[index]['task'];
+      selectedColor = tasks[index]['color'];
+      _isSelected = true; // Mark that a task is being edited
+    });
+
+    print('test');
+    // Show the bottom sheet
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: const Color.fromRGBO(245, 245, 245, 1),
+      builder: (BuildContext context) {
+        return Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                "Edit Task List",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 20),
+              TextField(
+                controller: _taskController,
+                decoration: InputDecoration(
+                  hintText: "Enter task description",
+                  hintStyle: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.black45,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                  filled: true,
+                  fillColor: const Color.fromRGBO(191, 191, 191, 1),
+                ),
+              ),
+              const SizedBox(height: 10),
+              // Display the selected color
+              Container(
+                margin: const EdgeInsets.symmetric(vertical: 10),
+                width: double.infinity,
+                height: 45,
+                decoration: BoxDecoration(
+                  color: _isSelected ? selectedColor : defaultColor,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: Colors.black.withOpacity(0.1),
+                  ),
+                ),
+                child: ElevatedButton(
+                  onPressed: _colorOption,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                    padding: EdgeInsets.zero,
+                  ),
+                  child: const Text(
+                    "Select Task Color",
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      if (_taskController.text.isNotEmpty) {
+                        setState(() {
+                          // Check if editing an existing task
+                          if (_editingTaskIndex != null) {
+                            // Update the existing task
+                            tasks[_editingTaskIndex!] = {
+                              'task': _taskController.text,
+                              'color': selectedColor,
+                            };
+                          } else {
+                            // Add new task
+                            tasks.add({
+                              'task': _taskController.text,
+                              'color': selectedColor,
+                            });
+                          }
+                          _isSelected = false;
+                          _taskController.clear();
+                          _editingTaskIndex = null; // Reset editing index
+                        });
+                      }
+                      Navigator.of(context).pop(); // Close the bottom sheet
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromRGBO(123, 119, 148, 1),
+                      foregroundColor: const Color.fromRGBO(245, 245, 245, 1),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 30),
+                    ),
+                    child: const Text("Save"),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   void _colorOption() {
     showDialog(
       context: context,
@@ -166,10 +296,12 @@ class _HomePageWorkspaceState extends State<HomePageWorkspace> {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: const SideDrawer(),
+      key: _scaffoldKey,
+      endDrawerEnableOpenDragGesture: false,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: const Color.fromRGBO(68, 64, 77, 1),
@@ -183,11 +315,16 @@ class _HomePageWorkspaceState extends State<HomePageWorkspace> {
                 color: Color.fromRGBO(245, 245, 245, 1),
                 shape: BoxShape.circle,
               ),
-              child: const Center(
-                child: Icon(
-                  Icons.menu,
-                  size: 20,
-                  color: Color.fromRGBO(68, 64, 77, 1),
+              child: Center(
+                child: IconButton(
+                  icon: const Icon(
+                    Icons.menu,
+                    size: 20,
+                    color: Color.fromRGBO(68, 64, 77, 1),
+                  ),
+                  onPressed: (){
+                    _scaffoldKey.currentState!.openDrawer();
+                  },
                 ),
               ),
             ),
@@ -231,7 +368,9 @@ class _HomePageWorkspaceState extends State<HomePageWorkspace> {
                   size: 20,
                   color: Color.fromRGBO(68, 64, 77, 1),
                 ),
-                onPressed: () {},
+                onPressed: () {
+
+                },
               ),
             ),
           ),
@@ -274,7 +413,7 @@ class _HomePageWorkspaceState extends State<HomePageWorkspace> {
                   child: OutlinedButton(
                     onPressed: () {
                       Navigator.of(context).push(MaterialPageRoute(
-                        builder: (builder) => HomePageWorkspace(user: widget.user),
+                        builder: (builder) => HomePagePersonal(user: widget.user),
                       ));
                     },
                     style: ElevatedButton.styleFrom(
@@ -285,7 +424,7 @@ class _HomePageWorkspaceState extends State<HomePageWorkspace> {
                       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 30),
                     ),
                     child: const Text(
-                      'Personal',
+                      'Workspace',
                       style: TextStyle(
                         color: Color.fromRGBO(245, 245, 245, 1),
                         fontWeight: FontWeight.w500,
@@ -333,15 +472,14 @@ class _HomePageWorkspaceState extends State<HomePageWorkspace> {
                       ),
                       itemCount: tasks.length,
                       itemBuilder: (context, index) {
-                        // Access the 'task' and 'color' from the map at index
                         String taskText = tasks[index]['task'];
                         Color taskColor = tasks[index]['color'];
-
-                        return TaskWidget(text: taskText, color: taskColor);
+                        return TaskWidget(text: taskText, color: taskColor, index: index,onEdit: (index) {
+                          editTask(index);
+                        },);
                       },
                     ),
-                  )
-
+                  ),
                 ],
               ),
             ),

@@ -3,10 +3,16 @@ import 'package:flutter/material.dart';
 enum Options { Edit, Delete, Access }
 
 class TaskWidget extends StatelessWidget {
-  const TaskWidget({super.key, required this.text, required this.color});
+  const TaskWidget(
+      {super.key,
+      required this.text,
+      required this.color,
+      required this.onEdit, required this.index});
 
   final String text;
   final Color color;
+  final Function(int index) onEdit;
+  final int index;
 
   @override
   Widget build(BuildContext context) {
@@ -36,8 +42,10 @@ class TaskWidget extends StatelessWidget {
           ),
           // Posisi ikon titik tiga
           Positioned(
-            top: 8, // Menyesuaikan posisi vertikal
-            right: 8, // Menyesuaikan posisi horizontal agar tidak terlalu dekat dengan tepi kanan
+            top: 8,
+            // Menyesuaikan posisi vertikal
+            right: 8,
+            // Menyesuaikan posisi horizontal agar tidak terlalu dekat dengan tepi kanan
             child: PopupMenuButton<Options>(
               icon: const Icon(
                 Icons.more_vert, // Ikon titik tiga
@@ -49,6 +57,7 @@ class TaskWidget extends StatelessWidget {
                 switch (option) {
                   case Options.Edit:
                     print("Edit selected");
+                    onEdit(index);
                     break;
                   case Options.Delete:
                     print("Delete selected");
@@ -61,34 +70,47 @@ class TaskWidget extends StatelessWidget {
               itemBuilder: (BuildContext context) => [
                 const PopupMenuItem<Options>(
                   value: Options.Edit,
-                  padding: EdgeInsets.symmetric(vertical: 0, horizontal: 10), // Remove padding to make it tighter
-                  height: 20, // Reduce the height of each menu item
+                  padding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
+                  // Remove padding to make it tighter
+                  height: 20,
+                  // Reduce the height of each menu item
                   child: Text(
                     "Edit",
-                    style: TextStyle(fontSize: 12, height: 1.0), // Smaller text with tight height
+                    style: TextStyle(
+                        fontSize: 12,
+                        height: 1.0), // Smaller text with tight height
                   ),
                 ),
                 const PopupMenuItem<Options>(
                   value: Options.Delete,
-                  padding: EdgeInsets.symmetric(vertical: 0, horizontal: 10), // Remove padding
-                  height: 20, // Same as above, reduce height
+                  padding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
+                  // Remove padding
+                  height: 20,
+                  // Same as above, reduce height
                   child: Text(
                     "Delete",
-                    style: TextStyle(fontSize: 12, height: 1.0), // Smaller text with tight height
+                    style: TextStyle(
+                        fontSize: 12,
+                        height: 1.0), // Smaller text with tight height
                   ),
                 ),
                 const PopupMenuItem<Options>(
                   value: Options.Access,
-                  padding: EdgeInsets.symmetric(vertical: 0, horizontal: 10), // Remove padding
-                  height: 20, // Same reduced height
+                  padding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
+                  // Remove padding
+                  height: 20,
+                  // Same reduced height
                   child: Text(
                     "Access",
-                    style: TextStyle(fontSize: 12, height: 1.0), // Smaller text with tight height
+                    style: TextStyle(
+                        fontSize: 12,
+                        height: 1.0), // Smaller text with tight height
                   ),
                 ),
               ],
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12.0), // Membuat sudut menu bulat
+                borderRadius:
+                    BorderRadius.circular(12.0), // Membuat sudut menu bulat
               ),
               color: Colors.white, // Background warna putih untuk pop-up menu
             ),
