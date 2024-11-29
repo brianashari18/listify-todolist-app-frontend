@@ -93,9 +93,7 @@ class ApiService {
       final response = await http.post(
         Uri.parse('$_baseUrl/users/forgot-password'),
         headers: {'Content-Type': 'application/json'},
-        body: json.encode({
-          'email': email
-        }),
+        body: json.encode({'email': email}),
       );
 
       if (response.statusCode == 200) {
@@ -121,9 +119,7 @@ class ApiService {
       final response = await http.post(
         Uri.parse('$_baseUrl/users/validateOtp'),
         headers: {'Content-Type': 'application/json'},
-        body: json.encode({
-          'otp': otp
-        }),
+        body: json.encode({'otp': otp}),
       );
 
       if (response.statusCode == 200) {
@@ -142,5 +138,14 @@ class ApiService {
     } catch (e) {
       return {'success': false, 'error': 'Error: $e'};
     }
+  }
+
+  Future<http.Response> getTask(String url) {
+    return http.get(Uri.parse('$_baseUrl$url'));
+  }
+
+  Future<http.Response> addTask(String url, Map<String, dynamic> body) {
+    return http.post(Uri.parse('$_baseUrl$url'),
+        headers: {'Content-type': 'application/json'}, body: body);
   }
 }

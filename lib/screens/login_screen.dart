@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:listify/screens/forget_password_screen.dart';
 import 'package:listify/screens/homepage_personal_screen.dart';
 import 'package:listify/screens/register_screen.dart';
@@ -22,12 +21,8 @@ class _LoginScreenState extends State<LoginScreen> {
   final GoogleService _googleService = GoogleService();
 
   String? _emailError;
+  String? _passwordError;
   bool _obscurePassword = true;
-  bool _isMinLength = false;
-  bool _hasUpperCase = false;
-  bool _hasLowerCase = false;
-  bool _hasNumber = false;
-  bool _hasSpecialCharacter = false;
   bool _isSignIn = false;
 
   @override
@@ -98,7 +93,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: TextField(
                       controller: _passwordController,
                       obscureText: _obscurePassword,
-                      onChanged: _checkPassword,
                       decoration: InputDecoration(
                         labelText: 'Password',
                         labelStyle: const TextStyle(
@@ -122,6 +116,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         filled: true,
                         fillColor: Colors.white,
+                        errorText: _passwordError,
                       ),
                     ),
                   ),
@@ -149,33 +144,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 10),
-                  const Text(
-                    "Password must meet the following criteria:",
-                    style: TextStyle(fontSize: 14, color: Colors.black54),
-                  ),
-                  const SizedBox(height: 10),
-                  _buildPasswordCriteria(
-                    text: "Min. 8 characters",
-                    isValid: _isMinLength,
-                  ),
-                  _buildPasswordCriteria(
-                    text: "Include uppercase letter",
-                    isValid: _hasUpperCase,
-                  ),
-                  _buildPasswordCriteria(
-                    text: "Include lowercase letter",
-                    isValid: _hasLowerCase,
-                  ),
-                  _buildPasswordCriteria(
-                    text: "Include number",
-                    isValid: _hasNumber,
-                  ),
-                  _buildPasswordCriteria(
-                    text: "Include a special character",
-                    isValid: _hasSpecialCharacter,
-                  ),
-                  const SizedBox(height: 75),
+                  const SizedBox(height: 250),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
@@ -198,7 +167,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                     ),
                   ),
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 20),
                   Align(
                     alignment: Alignment.center,
                     child: InkWell(
@@ -221,7 +190,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 50),
+                  const SizedBox(height: 30),
                   const Text(
                     'Or continue with',
                     style: TextStyle(color: Color.fromRGBO(68, 64, 77, 1)),
@@ -252,17 +221,6 @@ class _LoginScreenState extends State<LoginScreen> {
     return emailRegex.hasMatch(email);
   }
 
-  void _checkPassword(String password) {
-    setState(() {
-      _isMinLength = password.length >= 8;
-      _hasUpperCase = password.contains(RegExp(r'[A-Z]'));
-      _hasLowerCase = password.contains(RegExp(r'[a-z]'));
-      _hasNumber = password.contains(RegExp(r'\d'));
-      _hasSpecialCharacter =
-          password.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'));
-    });
-  }
-
   void _validateInputs() async {
     setState(() {
       _isSignIn = true;
@@ -273,6 +231,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     setState(() {
       _emailError = null;
+      _passwordError = null;
 
       if (email.isEmpty || !_isValidEmail(email)) {
         _emailError = 'Enter a valid email address';
@@ -280,13 +239,14 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     });
 
+    if (password.isEmpty) {
+      _passwordError = 'Password cannot be empty';
+      FocusScope.of(context).requestFocus(FocusNode());
+    }
+
     // Validasi Password
     if (_emailError == null &&
-        _isMinLength &&
-        _hasUpperCase &&
-        _hasLowerCase &&
-        _hasNumber &&
-        _hasSpecialCharacter) {
+        _passwordError == null) {
       final result = await _apiService.login(email, password);
       if (result['success'] == 'true') {
         User user = User(
@@ -316,27 +276,6 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() {
       _isSignIn = false;
     });
-  }
-
-  Widget _buildPasswordCriteria({required String text, required bool isValid}) {
-    return Row(
-      children: [
-        Icon(
-          isValid ? Icons.check_circle : Icons.cancel,
-          color: isValid ? Colors.green : Colors.red,
-          size: 20,
-        ),
-        const SizedBox(width: 8),
-        Text(
-          text,
-          style: TextStyle(
-            color: isValid ? Colors.green : Colors.red,
-            fontSize: 14,
-            fontWeight: isValid ? FontWeight.w600 : FontWeight.normal,
-          ),
-        ),
-      ],
-    );
   }
 
   void _onLoginGoogle() async {
