@@ -2,21 +2,23 @@ import 'package:flutter/material.dart';
 
 
 class AboutPage extends StatelessWidget {
+  const AboutPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF393646), // Background color
+      backgroundColor: const Color(0xFF393646), // Background color
       appBar: AppBar(
-        backgroundColor: Color(0xFF393646), // Same as background
+        backgroundColor: const Color(0xFF393646), // Same as background
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             // Action for back button
             Navigator.pop(context);
           },
         ),
-        title: Text(
+        title: const Text(
           "About",
           style: TextStyle(
             color: Colors.white,
@@ -39,7 +41,7 @@ class AboutPage extends StatelessWidget {
                 ),
               ),
             ),
-            Expanded(
+            const Expanded(
               flex: 3,
               child: SingleChildScrollView(
                 child: Text(

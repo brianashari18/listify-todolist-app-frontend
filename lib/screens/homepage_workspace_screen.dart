@@ -1,26 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
-import 'package:listify/screens/homepageWorkspace_screen.dart';
-import 'package:listify/widgets/side_drawer.dart';
+import 'package:listify/screens/homepage_workspace_screen.dart';
 import 'package:listify/widgets/task_widget.dart';
 import '../models/user_model.dart';
 
-class HomePagePersonal extends StatefulWidget {
-  const HomePagePersonal({super.key, required this.user});
+class HomePageWorkspace extends StatefulWidget {
+  const HomePageWorkspace({super.key, required this.user});
 
   final User user;
 
   @override
-  State<HomePagePersonal> createState() => _HomePagePersonalState();
+  State<HomePageWorkspace> createState() => _HomePageWorkspaceState();
 }
 
-class _HomePagePersonalState extends State<HomePagePersonal> {
+class _HomePageWorkspaceState extends State<HomePageWorkspace> {
   final TextEditingController _taskController = TextEditingController();
   List<Map<String, dynamic>> tasks = [];
   Color defaultColor = const Color.fromRGBO(123, 119, 148, 1);
   Color selectedColor = const Color.fromRGBO(123, 119, 148, 1);
   bool _isSelected = false;
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void dispose() {
@@ -172,9 +170,6 @@ class _HomePagePersonalState extends State<HomePagePersonal> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: const SideDrawer(),
-      key: _scaffoldKey,
-      endDrawerEnableOpenDragGesture: false,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: const Color.fromRGBO(68, 64, 77, 1),
@@ -188,16 +183,11 @@ class _HomePagePersonalState extends State<HomePagePersonal> {
                 color: Color.fromRGBO(245, 245, 245, 1),
                 shape: BoxShape.circle,
               ),
-              child: Center(
-                child: IconButton(
-                  icon: const Icon(
-                    Icons.menu,
-                    size: 20,
-                    color: Color.fromRGBO(68, 64, 77, 1),
-                  ),
-                  onPressed: (){
-                    _scaffoldKey.currentState!.openDrawer();
-                  },
+              child: const Center(
+                child: Icon(
+                  Icons.menu,
+                  size: 20,
+                  color: Color.fromRGBO(68, 64, 77, 1),
                 ),
               ),
             ),
@@ -241,9 +231,7 @@ class _HomePagePersonalState extends State<HomePagePersonal> {
                   size: 20,
                   color: Color.fromRGBO(68, 64, 77, 1),
                 ),
-                onPressed: () {
-
-                },
+                onPressed: () {},
               ),
             ),
           ),

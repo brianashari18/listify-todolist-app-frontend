@@ -1,14 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:listify/screens/forgetPassword_Screen.dart';
-import 'package:listify/screens/homepagePersonal_screen.dart';
-import 'package:listify/screens/homepageWorkspace_screen.dart';
-import 'package:listify/screens/login_screen.dart';
-import 'package:listify/screens/register_screen.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:listify/screens/start_screen.dart';
 
-import 'models/user_model.dart';
-
-void main() {
+Future<void> main() async {
+  await dotenv.load(fileName: ".env");
   runApp(const MyApp());
 }
 

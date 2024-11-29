@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:listify/screens/verification_screen.dart';
 
@@ -14,6 +12,8 @@ class ForgetPasswordScreen extends StatefulWidget {
 
 class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
   final TextEditingController _emailController = TextEditingController();
+  final ApiService _apiService = ApiService();
+
 
   String? _emailError;
 
@@ -21,56 +21,6 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
   void dispose() {
     _emailController.dispose();
     super.dispose();
-  }
-
-  bool _isValidEmail(String email) {
-    final RegExp emailRegex =
-        RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
-    return emailRegex.hasMatch(email);
-  }
-
-  void _handleContinue() async {
-    final email = _emailController.text.trim();
-    if (_isValidEmail(email)) {
-      setState(() {
-        _emailError = null;
-      });
-      try {
-        final requestBody = <String, dynamic>{
-          "email": email,
-        };
-
-        final response = await ApiService.forgotPassword(
-            "/api/users/forgot-password", requestBody);
-
-        if (response.statusCode == 200) {
-          final Map<String, dynamic> responseBody = jsonDecode(response.body);
-          print("Response: $responseBody");
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text(responseBody["message"])));
-
-          Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => VerificationScreen(
-                    email: email,
-                  )));
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Email is not exists")),
-          );
-          print("Error: ${response.body}");
-        }
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("$e.")),
-        );
-        print("Exception: $e");
-      }
-    } else {
-      setState(() {
-        _emailError = 'Please enter a valid email address';
-        FocusScope.of(context).requestFocus(FocusNode());
-      });
-    }
   }
 
   @override
@@ -178,5 +128,40 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
       ),
       backgroundColor: const Color.fromRGBO(68, 64, 77, 1),
     );
+  }
+
+  bool _isValidEmail(String email) {
+    final RegExp emailRegex =
+    RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+    return emailRegex.hasMatch(email);
+  }
+
+  void _handleContinue() async {
+    final email = _emailController.text.trim();
+    if (_isValidEmail(email)) {
+      setState(() {
+        _emailError = null;
+      });
+
+      final result = await _apiService.forgotPassword(email);
+      if (result['success'] == 'true') {
+        final message = result['message'];
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(message)));
+        Navigator.of(context).push(
+          MaterialPageRoute(
+              builder: (context) => VerificationScreen(email: email)),
+        );
+      } else {
+        final errorMessage = result['error'];
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(errorMessage)));
+      }
+    } else {
+      setState(() {
+        _emailError = 'Please enter a valid email address';
+        FocusScope.of(context).requestFocus(FocusNode());
+      });
+    }
   }
 }
