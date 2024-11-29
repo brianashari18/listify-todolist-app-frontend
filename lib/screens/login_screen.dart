@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:listify/screens/homepagePersonal_screen.dart';
-
 import '../models/user_model.dart';
 import '../services/api_service.dart';
 
@@ -17,12 +16,8 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
 
   String? _emailError;
+  String? _passwordError;
   bool _obscurePassword = true;
-  bool _isMinLength = false;
-  bool _hasUpperCase = false;
-  bool _hasLowerCase = false;
-  bool _hasNumber = false;
-  bool _hasSpecialCharacter = false;
 
   @override
   void dispose() {
@@ -37,23 +32,13 @@ class _LoginScreenState extends State<LoginScreen> {
     return emailRegex.hasMatch(email);
   }
 
-  void _checkPassword(String password) {
-    setState(() {
-      _isMinLength = password.length >= 8;
-      _hasUpperCase = password.contains(RegExp(r'[A-Z]'));
-      _hasLowerCase = password.contains(RegExp(r'[a-z]'));
-      _hasNumber = password.contains(RegExp(r'\d'));
-      _hasSpecialCharacter =
-          password.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'));
-    });
-  }
-
   void _validateInputs() async {
     final email = _emailController.text;
     final password = _passwordController.text;
 
     setState(() {
       _emailError = null;
+      _passwordError = null;
 
       if (email.isEmpty || !_isValidEmail(email)) {
         _emailError = 'Enter a valid email address';
@@ -61,13 +46,13 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     });
 
+    if (password.isEmpty) {
+      _passwordError = 'Password cannot be empty';
+      FocusScope.of(context).requestFocus(FocusNode());
+    }
+
     // Validasi Password
-    if (_emailError == null &&
-        _isMinLength &&
-        _hasUpperCase &&
-        _hasLowerCase &&
-        _hasNumber &&
-        _hasSpecialCharacter) {
+    if (_emailError == null && _passwordError == null){
       // Jika validasi berhasil, kirim data ke backend
       try {
         final requestBody = <String, dynamic>{
@@ -98,12 +83,14 @@ class _LoginScreenState extends State<LoginScreen> {
             User user = User(
                 id: data["id"],
                 username: data["username"],
-                email: data["email"]);
+                email: data["email"]
+            );
 
             Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute(
                     builder: (context) => HomePagePersonal(
                           user: user,
+
                         )),
                 (Route<dynamic> route) => false);
           } else if (responseUser.statusCode == 401) {
@@ -124,7 +111,7 @@ class _LoginScreenState extends State<LoginScreen> {
         } else {
           // Login gagal
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Login Failed")),
+            const SnackBar(content: Text("Login Failed because email or password not valid")),
           );
           print("Error: ${response.body}");
         }
@@ -137,27 +124,6 @@ class _LoginScreenState extends State<LoginScreen> {
     } else {
       print('Login Failed');
     }
-  }
-
-  Widget _buildPasswordCriteria({required String text, required bool isValid}) {
-    return Row(
-      children: [
-        Icon(
-          isValid ? Icons.check_circle : Icons.cancel,
-          color: isValid ? Colors.green : Colors.red,
-          size: 20,
-        ),
-        const SizedBox(width: 8),
-        Text(
-          text,
-          style: TextStyle(
-            color: isValid ? Colors.green : Colors.red,
-            fontSize: 14,
-            fontWeight: isValid ? FontWeight.w600 : FontWeight.normal,
-          ),
-        ),
-      ],
-    );
   }
 
   @override
@@ -221,7 +187,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: TextField(
                       controller: _passwordController,
                       obscureText: _obscurePassword,
-                      onChanged: _checkPassword,
                       decoration: InputDecoration(
                         labelText: 'Password',
                         labelStyle: const TextStyle(
@@ -245,6 +210,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         filled: true,
                         fillColor: Colors.white,
+                        errorText: _passwordError,
                       ),
                     ),
                   ),
@@ -270,33 +236,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 10),
-                  const Text(
-                    "Password must meet the following criteria:",
-                    style: TextStyle(fontSize: 14, color: Colors.black54),
-                  ),
-                  const SizedBox(height: 10),
-                  _buildPasswordCriteria(
-                    text: "Min. 8 characters",
-                    isValid: _isMinLength,
-                  ),
-                  _buildPasswordCriteria(
-                    text: "Include uppercase letter",
-                    isValid: _hasUpperCase,
-                  ),
-                  _buildPasswordCriteria(
-                    text: "Include lowercase letter",
-                    isValid: _hasLowerCase,
-                  ),
-                  _buildPasswordCriteria(
-                    text: "Include number",
-                    isValid: _hasNumber,
-                  ),
-                  _buildPasswordCriteria(
-                    text: "Include a special character",
-                    isValid: _hasSpecialCharacter,
-                  ),
-                  const SizedBox(height: 75),
+                  const SizedBox(height: 250),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
@@ -317,7 +257,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 20),
                   Align(
                     alignment: Alignment.center,
                     child: InkWell(
@@ -339,7 +279,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 50),
+                  const SizedBox(height: 30),
                   const Text(
                     'Or continue with',
                     style: TextStyle(color: Color.fromRGBO(68, 64, 77, 1)),

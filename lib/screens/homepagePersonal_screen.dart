@@ -26,6 +26,8 @@ class _HomePagePersonalState extends State<HomePagePersonal> {
   Color selectedColor = const Color.fromRGBO(123, 119, 148, 1);
   bool _isSelected = false;
   int? _editingTaskIndex;
+  int? _deletingTaskIndex;
+  int? _accessTaskIndex;
 
   @override
   void initState() {
@@ -45,6 +47,7 @@ class _HomePagePersonalState extends State<HomePagePersonal> {
         "name" : _taskController.text,
         "color" : selectedColor
       };
+      
       final responseInput =
           await ApiService.addTask("/api/tasks", requestBody);
 
@@ -183,7 +186,6 @@ class _HomePagePersonalState extends State<HomePagePersonal> {
       _isSelected = true; // Mark that a task is being edited
     });
 
-    print('test');
     // Show the bottom sheet
     showModalBottomSheet(
       context: context,
@@ -299,6 +301,81 @@ class _HomePagePersonalState extends State<HomePagePersonal> {
     );
   }
 
+  void deleteTask(int index){
+    setState(() {
+      _deletingTaskIndex = index;
+    });
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: const Color.fromRGBO(245, 245, 245, 1),
+      builder: (BuildContext context) {
+        return Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                "Do you want to delete this task list?",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      if (_taskController.text.isNotEmpty) {
+                        setState(() {
+                          // Check if editing an existing task
+                          if (_editingTaskIndex != null) {
+                            // Update the existing task
+                            tasks[_editingTaskIndex!] = {
+                              'task': _taskController.text,
+                              'color': selectedColor,
+                            };
+                          } else {
+                            // Add new task
+                            tasks.add({
+                              'task': _taskController.text,
+                              'color': selectedColor,
+                            });
+                          }
+                          _isSelected = false;
+                          _taskController.clear();
+                          _editingTaskIndex = null; // Reset editing index
+                        });
+                      }
+                      Navigator.of(context).pop(); // Close the bottom sheet
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromRGBO(123, 119, 148, 1),
+                      foregroundColor: const Color.fromRGBO(245, 245, 245, 1),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 30),
+                    ),
+                    child: const Text("Save"),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void accessTask(int index){
+
+  }
+
   void _colorOption() {
     showDialog(
       context: context,
@@ -370,7 +447,7 @@ class _HomePagePersonalState extends State<HomePagePersonal> {
 
         final responseData = jsonDecode(responseInput.body);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Registrasi Failed")),
+          const SnackBar(content: Text("Task is Empty!")),
         );
         print("Error: ${responseInput.body}");
       }
@@ -560,12 +637,24 @@ class _HomePagePersonalState extends State<HomePagePersonal> {
                       itemBuilder: (context, index) {
                         String taskText = tasks[index]['task'];
                         Color taskColor = tasks[index]['color'];
-                        return TaskWidget(text: taskText, color: taskColor, index: index,onEdit: (index) {
-                          editTask(index);
-                        },);
+                        return TaskWidget(
+                          text: taskText,
+                          color: taskColor,
+                          index: index,
+                          onEdit: (index) {
+                            editTask(index);  // When Edit is selected
+                          },
+                          onDelete: (index) {
+                            deleteTask(index); // When Delete is selected
+                          },
+                          onAccess: (index) {
+                            accessTask(index);  // When Access is selected
+                          },
+                        );
                       },
                     ),
                   ),
+
                 ],
               ),
             ),

@@ -7,11 +7,17 @@ class TaskWidget extends StatelessWidget {
       {super.key,
       required this.text,
       required this.color,
-      required this.onEdit, required this.index});
+      required this.onEdit,
+      required this.onDelete,
+      required this.onAccess,
+      required this.index
+      });
 
   final String text;
   final Color color;
   final Function(int index) onEdit;
+  final Function(int index) onDelete;
+  final Function(int index) onAccess;
   final int index;
 
   @override
@@ -61,9 +67,11 @@ class TaskWidget extends StatelessWidget {
                     break;
                   case Options.Delete:
                     print("Delete selected");
+                    onDelete(index);
                     break;
                   case Options.Access:
                     print("Access selected");
+                    onAccess(index);
                     break;
                 }
               },
