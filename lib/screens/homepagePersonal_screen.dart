@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:listify/screens/homepageWorkspace_screen.dart';
+import 'package:listify/widgets/side_drawer.dart';
 import 'package:listify/widgets/task_widget.dart';
 import '../models/user_model.dart';
 
@@ -19,6 +20,7 @@ class _HomePagePersonalState extends State<HomePagePersonal> {
   Color defaultColor = const Color.fromRGBO(123, 119, 148, 1);
   Color selectedColor = const Color.fromRGBO(123, 119, 148, 1);
   bool _isSelected = false;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void dispose() {
@@ -170,6 +172,9 @@ class _HomePagePersonalState extends State<HomePagePersonal> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: const SideDrawer(),
+      key: _scaffoldKey,
+      endDrawerEnableOpenDragGesture: false,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: const Color.fromRGBO(68, 64, 77, 1),
@@ -183,11 +188,16 @@ class _HomePagePersonalState extends State<HomePagePersonal> {
                 color: Color.fromRGBO(245, 245, 245, 1),
                 shape: BoxShape.circle,
               ),
-              child: const Center(
-                child: Icon(
-                  Icons.menu,
-                  size: 20,
-                  color: Color.fromRGBO(68, 64, 77, 1),
+              child: Center(
+                child: IconButton(
+                  icon: const Icon(
+                    Icons.menu,
+                    size: 20,
+                    color: Color.fromRGBO(68, 64, 77, 1),
+                  ),
+                  onPressed: (){
+                    _scaffoldKey.currentState!.openDrawer();
+                  },
                 ),
               ),
             ),
@@ -231,7 +241,9 @@ class _HomePagePersonalState extends State<HomePagePersonal> {
                   size: 20,
                   color: Color.fromRGBO(68, 64, 77, 1),
                 ),
-                onPressed: () {},
+                onPressed: () {
+
+                },
               ),
             ),
           ),

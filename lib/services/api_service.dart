@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class ApiService {
@@ -20,12 +21,34 @@ class ApiService {
     );
   }
 
+  static Future<http.Response> loginWithGoogle(String url, String code) {
+    return http.post(
+      Uri.parse("$baseUrl$url?code=$code")
+    );
+  }
+
   static Future<http.Response> getCurrent(String url, String token) {
     return http.get(
+        Uri.parse("$baseUrl$url"),
+        headers: {
+          "Authorization": token
+        }
+    );
+  }
+
+  static Future<http.Response> forgotPassword(String url, Map<String, dynamic> requestBody) {
+    return http.post(
       Uri.parse("$baseUrl$url"),
-      headers: {
-        "Authorization": token
-      }
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode(requestBody),
+    );
+  }
+
+  static Future<http.Response> validateOTP(String url, Map<String, dynamic> requestBody) {
+    return http.post(
+      Uri.parse("$baseUrl$url"),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode(requestBody),
     );
   }
 }

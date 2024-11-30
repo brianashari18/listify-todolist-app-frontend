@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+enum Options { Edit, Delete, Access }
+
 class TaskWidget extends StatelessWidget {
   const TaskWidget({super.key, required this.text, required this.color});
 
@@ -17,6 +19,7 @@ class TaskWidget extends StatelessWidget {
       ),
       child: Stack(
         children: [
+          // Teks utama yang ditampilkan di tengah
           Center(
             child: Padding(
               padding: const EdgeInsets.all(8.0),
@@ -31,51 +34,64 @@ class TaskWidget extends StatelessWidget {
               ),
             ),
           ),
+
+          // Posisi ikon titik tiga
           Positioned(
-            top: 5, // Jarak dari atas
-            right: 0, // Jarak dari kanan
-            child:  IconButton(
+            top: 8, // Menyesuaikan posisi vertikal
+            right: 8, // Menyesuaikan posisi horizontal agar tidak terlalu dekat dengan tepi kanan
+            child: PopupMenuButton<Options>(
               icon: const Icon(
                 Icons.more_vert, // Ikon titik tiga
-                size: 20, // Ukuran ikon sesuai gambar
-                color: Colors.black,
+                size: 24, // Ukuran ikon sedikit lebih besar untuk kejelasan
+                color: Colors.white, // Warna ikon putih
               ),
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: const Text("Pilih Aksi"),
-                      content: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          ListTile(
-                            title: const Text("Edit"),
-                            onTap: () {
-                              print("Edit selected");
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                          ListTile(
-                            title: const Text("Delete"),
-                            onTap: () {
-                              print("Delete selected");
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                          ListTile(
-                            title: const Text("Access"),
-                            onTap: () {
-                              print("Access selected");
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                );
+              onSelected: (Options option) {
+                // Menangani aksi yang dipilih
+                switch (option) {
+                  case Options.Edit:
+                    print("Edit selected");
+                    break;
+                  case Options.Delete:
+                    print("Delete selected");
+                    break;
+                  case Options.Access:
+                    print("Access selected");
+                    break;
+                }
               },
+              itemBuilder: (BuildContext context) => [
+                const PopupMenuItem<Options>(
+                  value: Options.Edit,
+                  padding: EdgeInsets.symmetric(vertical: 0, horizontal: 10), // Remove padding to make it tighter
+                  height: 20, // Reduce the height of each menu item
+                  child: Text(
+                    "Edit",
+                    style: TextStyle(fontSize: 12, height: 1.0), // Smaller text with tight height
+                  ),
+                ),
+                const PopupMenuItem<Options>(
+                  value: Options.Delete,
+                  padding: EdgeInsets.symmetric(vertical: 0, horizontal: 10), // Remove padding
+                  height: 20, // Same as above, reduce height
+                  child: Text(
+                    "Delete",
+                    style: TextStyle(fontSize: 12, height: 1.0), // Smaller text with tight height
+                  ),
+                ),
+                const PopupMenuItem<Options>(
+                  value: Options.Access,
+                  padding: EdgeInsets.symmetric(vertical: 0, horizontal: 10), // Remove padding
+                  height: 20, // Same reduced height
+                  child: Text(
+                    "Access",
+                    style: TextStyle(fontSize: 12, height: 1.0), // Smaller text with tight height
+                  ),
+                ),
+              ],
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.0), // Membuat sudut menu bulat
+              ),
+              color: Colors.white, // Background warna putih untuk pop-up menu
             ),
           ),
         ],
