@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
-import 'package:listify/screens/homepageWorkspace_screen.dart';
+import 'package:listify/screens/homepage_workspace_screen.dart';
 import 'package:listify/widgets/side_drawer.dart';
 import 'package:listify/widgets/task_widget.dart';
 import '../models/user_model.dart';
@@ -21,6 +21,7 @@ class _HomePagePersonalState extends State<HomePagePersonal> {
 
   List<Map<String, dynamic>> tasks = [];
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final ApiService _apiService = ApiService();
 
   Color defaultColor = const Color.fromRGBO(123, 119, 148, 1);
   Color selectedColor = const Color.fromRGBO(123, 119, 148, 1);
@@ -49,7 +50,7 @@ class _HomePagePersonalState extends State<HomePagePersonal> {
       };
       
       final responseInput =
-          await ApiService.addTask("/api/tasks", requestBody);
+          await _apiService.addTask("/api/tasks", requestBody);
 
       if (responseInput.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -417,7 +418,7 @@ class _HomePagePersonalState extends State<HomePagePersonal> {
   void getTask() async {
     try {
       final responseInput =
-          await ApiService.getTask("/api/users/${widget.user}/tasks");
+          await _apiService.getTask("/api/users/${widget.user}/tasks");
 
       if (responseInput.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -578,9 +579,9 @@ class _HomePagePersonalState extends State<HomePagePersonal> {
                 SizedBox(
                   child: OutlinedButton(
                     onPressed: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (builder) => HomePageWorkspace(user: widget.user),
-                      ));
+                      // Navigator.of(context).push(MaterialPageRoute(
+                      //     builder: (builder) => HomePageWorkspace(user: widget.user),
+                      // ));
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color.fromRGBO(123, 119, 148, 1),

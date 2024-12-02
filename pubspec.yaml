@@ -39,6 +39,8 @@ dependencies:
   cupertino_icons: ^1.0.8
   carousel_slider: ^5.0.0
   flutter_colorpicker: ^1.1.0
+  google_sign_in: ^6.2.2
+  flutter_dotenv: ^5.2.1
 
 dev_dependencies:
   flutter_test:
@@ -70,6 +72,7 @@ flutter:
     - assets/icons/google.png
     - assets/images/aboutt.png
     - assets/images/logo.png
+    - .env
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

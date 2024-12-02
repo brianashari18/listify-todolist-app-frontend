@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:listify/widgets/subtask_widget.dart';
-import '../models/user_model.dart';
 
 class SubTask extends StatefulWidget {
   const SubTask({super.key});

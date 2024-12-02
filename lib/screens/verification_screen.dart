@@ -1,7 +1,6 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:listify/widgets/verification_field_widget.dart';
 
 import '../services/api_service.dart';
 
@@ -19,64 +18,17 @@ class _VerificationScreenState extends State<VerificationScreen> {
   final TextEditingController _textEditingController2 = TextEditingController();
   final TextEditingController _textEditingController3 = TextEditingController();
   final TextEditingController _textEditingController4 = TextEditingController();
+  final ApiService _apiService = ApiService();
+  bool _isVerify = false;
+  bool _isResend = false;
 
-  void _onVerify(String otp) async {
-    try {
-      final requestBody = <String, dynamic>{
-        "otp": otp,
-      };
-
-      final response = await ApiService.validateOTP(
-          "/api/users/validate-otp", requestBody);
-
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> responseBody = jsonDecode(response.body);
-        print("Response: $responseBody");
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(responseBody["message"])));
-
-      //   Navigate to Reset Password
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("OTP is invalid")),
-        );
-        print("Error: ${response.body}");
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("$e.")),
-      );
-      print("Exception: $e");
-    }
-  }
-
-
-  void _resendCode() async {
-    try {
-      final requestBody = <String, dynamic>{
-        "email": widget.email,
-      };
-
-      final response = await ApiService.forgotPassword(
-          "/api/users/forgot-password", requestBody);
-
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> responseBody = jsonDecode(response.body);
-        print("Response: $responseBody");
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(responseBody["message"])));
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Email is not exists")),
-        );
-        print("Error: ${response.body}");
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("$e.")),
-      );
-      print("Exception: $e");
-    }
+  @override
+  void dispose() {
+    _textEditingController1.dispose();
+    _textEditingController2.dispose();
+    _textEditingController3.dispose();
+    _textEditingController4.dispose();
+    super.dispose();
   }
 
   @override
@@ -103,7 +55,9 @@ class _VerificationScreenState extends State<VerificationScreen> {
                     color: const Color.fromRGBO(30, 30, 42, 1),
                   ),
                 ),
-                const SizedBox(height: 40,),
+                const SizedBox(
+                  height: 40,
+                ),
                 Text(
                   'We have send a code to\n${widget.email}',
                   textAlign: TextAlign.center,
@@ -113,94 +67,22 @@ class _VerificationScreenState extends State<VerificationScreen> {
                     color: Color.fromRGBO(30, 30, 42, 1),
                   ),
                 ),
-                const SizedBox(height: 40,),
-
+                const SizedBox(
+                  height: 40,
+                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    SizedBox(
-                      height: 68,
-                      width: 64,
-                      child: TextField(
-                        controller: _textEditingController1,
-                        style: Theme.of(context).textTheme.headlineMedium,
-                        keyboardType: TextInputType.number,
-                        textAlign: TextAlign.center,
-                        inputFormatters: [
-                          LengthLimitingTextInputFormatter(1),
-                          FilteringTextInputFormatter.digitsOnly,
-                        ],
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(vertical: 18),
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 68,
-                      width: 64,
-                      child: TextField(
-                        controller: _textEditingController2,
-                        style: Theme.of(context).textTheme.headlineMedium,
-                        keyboardType: TextInputType.number,
-                        textAlign: TextAlign.center,
-                        inputFormatters: [
-                          LengthLimitingTextInputFormatter(1),
-                          FilteringTextInputFormatter.digitsOnly,
-                        ],
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(vertical: 18),
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 68,
-                      width: 64,
-                      child: TextField(
-                        controller: _textEditingController3,
-                        style: Theme.of(context).textTheme.headlineMedium,
-                        keyboardType: TextInputType.number,
-                        textAlign: TextAlign.center,
-                        inputFormatters: [
-                          LengthLimitingTextInputFormatter(1),
-                          FilteringTextInputFormatter.digitsOnly,
-                        ],
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(vertical: 18),
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 68,
-                      width: 64,
-                      child: TextField(
-                        controller: _textEditingController4,
-                        style: Theme.of(context).textTheme.headlineMedium,
-                        keyboardType: TextInputType.number,
-                        textAlign: TextAlign.center,
-                        inputFormatters: [
-                          LengthLimitingTextInputFormatter(1),
-                          FilteringTextInputFormatter.digitsOnly,
-                        ],
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(vertical: 18),
-                        ),
-                      ),
-                    ),
+                    VerificationFieldWidget(
+                        controller: _textEditingController1),
+                    VerificationFieldWidget(
+                        controller: _textEditingController2),
+                    VerificationFieldWidget(
+                        controller: _textEditingController3),
+                    VerificationFieldWidget(
+                        controller: _textEditingController4),
                   ],
                 )
-
               ]),
               Padding(
                 padding: const EdgeInsets.symmetric(
@@ -211,9 +93,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                     SizedBox(
                       width: double.infinity,
                       child: OutlinedButton(
-                        onPressed: () {
-                          () {};
-                        },
+                        onPressed: _onVerify,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color.fromRGBO(68, 64, 77, 1),
                           // Background color
@@ -222,13 +102,15 @@ class _VerificationScreenState extends State<VerificationScreen> {
                           ),
                           padding: const EdgeInsets.symmetric(vertical: 16),
                         ),
-                        child: const Text(
-                          'VERIFY',
-                          style: TextStyle(
-                            color: Color.fromRGBO(245, 245, 245, 1),
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        child: _isVerify
+                            ? const CircularProgressIndicator()
+                            : const Text(
+                                'VERIFY',
+                                style: TextStyle(
+                                  color: Color.fromRGBO(245, 245, 245, 1),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                       ),
                     ),
                     Row(
@@ -244,13 +126,18 @@ class _VerificationScreenState extends State<VerificationScreen> {
                             child: Container(
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 3, vertical: 6),
-                              child: const Text(
-                                'Resend Code',
-                                style: TextStyle(
-                                    color: Color.fromRGBO(68, 64, 77, 1),
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold),
-                              ),
+                              child: _isResend
+                                  ? const SizedBox(
+                                      height: 10,
+                                      width: 10,
+                                      child: CircularProgressIndicator())
+                                  : const Text(
+                                      'Resend Code',
+                                      style: TextStyle(
+                                          color: Color.fromRGBO(68, 64, 77, 1),
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold),
+                                    ),
                             ),
                           ),
                         ),
@@ -264,5 +151,65 @@ class _VerificationScreenState extends State<VerificationScreen> {
         ),
       ),
     );
+  }
+
+  void _onVerify() async {
+    setState(() {
+      _isVerify = true;
+    });
+
+    final otp =
+        '${_textEditingController1.text}${_textEditingController2.text}${_textEditingController3.text}${_textEditingController4.text}';
+
+    if (otp.length != 4) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please enter the full code')));
+
+      setState(() {
+        _isVerify = false;
+      });
+      return;
+    }
+
+    final result = await _apiService.validateOTP(int.parse(otp));
+
+    setState(() {
+      _isVerify = false;
+    });
+
+    if (result['success'] == 'true') {
+      final message = result['message'];
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(message)));
+    } else {
+      final errorMessage = result['error'];
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(errorMessage)));
+    }
+
+    _textEditingController1.clear();
+    _textEditingController2.clear();
+    _textEditingController3.clear();
+    _textEditingController4.clear();
+  }
+
+  void _resendCode() async {
+    setState(() {
+      _isResend = true;
+    });
+    final result = await _apiService.forgotPassword(widget.email);
+
+    setState(() {
+      _isResend = false;
+    });
+    if (result['success'] == 'true') {
+      final message = result['message'];
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(message)));
+    } else {
+      final errorMessage = result['error'];
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(errorMessage)));
+    }
   }
 }
