@@ -24,7 +24,7 @@ class _HomePagePersonalState extends State<HomePagePersonal> {
   final ApiService _apiService = ApiService();
 
   Color defaultColor = const Color.fromRGBO(123, 119, 148, 1);
-  Color selectedColor = const Color.fromRGBO(123, 119, 148, 1);
+  late Color selectedColor;
   bool _isSelected = false;
   int? _editingTaskIndex;
   int? _deletingTaskIndex;
@@ -154,6 +154,7 @@ class _HomePagePersonalState extends State<HomePagePersonal> {
                             'color': selectedColor,
                           });
                           _isSelected = false;
+                          selectedColor = defaultColor;
                           _taskController.clear(); // Clear the text field
                         });
                       }
