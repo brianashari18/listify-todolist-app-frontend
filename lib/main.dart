@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:listify/models/user_model.dart';
+import 'package:listify/screens/homepage_personal_screen.dart';
 import 'package:listify/screens/start_screen.dart';
 
 Future<void> main() async {
@@ -20,7 +22,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
-      home: const StartScreen()
+      home: HomePagePersonal(user: User(id: 1, username: 'username', email: 'email'))
     );
   }
 }

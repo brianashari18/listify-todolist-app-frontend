@@ -313,7 +313,7 @@ class _HomePagePersonalState extends State<HomePagePersonal> {
       backgroundColor: const Color.fromRGBO(245, 245, 245, 1),
       builder: (BuildContext context) {
         return Padding(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.only(bottom: 20, top: 40, left: 30,right: 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
@@ -325,7 +325,7 @@ class _HomePagePersonalState extends State<HomePagePersonal> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 30),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
@@ -335,6 +335,7 @@ class _HomePagePersonalState extends State<HomePagePersonal> {
                       setState(() {
                         if (_deletingTaskIndex != null) {
                           // Memindahkan task ke trash
+                          // tinggal dimasukin ke page trash ya karna blm ada
                           tasks.removeAt(_deletingTaskIndex!);  // Hapus task dari daftar utama
                           _deletingTaskIndex = null; // Reset index penghapusan
                         }
@@ -351,21 +352,6 @@ class _HomePagePersonalState extends State<HomePagePersonal> {
                     ),
                     child: const Text("Yes"),
                   ),
-                  const SizedBox(width: 10),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).pop(); // Menutup bottom sheet jika batal
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromRGBO(245, 245, 245, 1),
-                      foregroundColor: const Color.fromRGBO(123, 119, 148, 1),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 30),
-                    ),
-                    child: const Text("Cancel"),
-                  ),
                 ],
               ),
             ],
@@ -374,7 +360,6 @@ class _HomePagePersonalState extends State<HomePagePersonal> {
       },
     );
   }
-
 
   void accessTask(int index){
 
@@ -429,13 +414,13 @@ class _HomePagePersonalState extends State<HomePagePersonal> {
         // Sample response body (already decoded)
         final Map<String, dynamic> responseBody = jsonDecode(responseInput.body);
 
-// Extracting the "data" field (which is a list of maps)
+        // Extracting the "data" field (which is a list of maps)
         final List<dynamic> data = responseBody["data"];
 
-// Initialize an empty list to hold the transformed tasks
+        // Initialize an empty list to hold the transformed tasks
         List<Map<String, dynamic>> tasks = [];
 
-// Mapping the data to a new structure and adding to tasks
+        // Mapping the data to a new structure and adding to tasks
         data.map((item) {
           tasks.add({
             "text": item["name"],    // You can adjust the mapping as needed
@@ -445,7 +430,7 @@ class _HomePagePersonalState extends State<HomePagePersonal> {
           });
         });
 
-// Now the tasks list contains the transformed data
+        // Now the tasks list contains the transformed data
         print(tasks);
       } else {
 
@@ -658,7 +643,6 @@ class _HomePagePersonalState extends State<HomePagePersonal> {
                       },
                     ),
                   ),
-
                 ],
               ),
             ),
