@@ -301,7 +301,7 @@ class _HomePagePersonalState extends State<HomePagePersonal> {
     );
   }
 
-  void deleteTask(int index){
+  void deleteTask(int index) {
     setState(() {
       _deletingTaskIndex = index;
     });
@@ -330,28 +330,15 @@ class _HomePagePersonalState extends State<HomePagePersonal> {
                 children: [
                   ElevatedButton(
                     onPressed: () {
-                      if (_taskController.text.isNotEmpty) {
-                        setState(() {
-                          // Check if editing an existing task
-                          if (_editingTaskIndex != null) {
-                            // Update the existing task
-                            tasks[_editingTaskIndex!] = {
-                              'task': _taskController.text,
-                              'color': selectedColor,
-                            };
-                          } else {
-                            // Add new task
-                            tasks.add({
-                              'task': _taskController.text,
-                              'color': selectedColor,
-                            });
-                          }
-                          _isSelected = false;
-                          _taskController.clear();
-                          _editingTaskIndex = null; // Reset editing index
-                        });
-                      }
-                      Navigator.of(context).pop(); // Close the bottom sheet
+                      // Pindahkan task ke trashTasks
+                      setState(() {
+                        if (_deletingTaskIndex != null) {
+                          // Memindahkan task ke trash
+                          tasks.removeAt(_deletingTaskIndex!);  // Hapus task dari daftar utama
+                          _deletingTaskIndex = null; // Reset index penghapusan
+                        }
+                      });
+                      Navigator.of(context).pop(); // Menutup bottom sheet
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color.fromRGBO(123, 119, 148, 1),
@@ -361,7 +348,22 @@ class _HomePagePersonalState extends State<HomePagePersonal> {
                       ),
                       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 30),
                     ),
-                    child: const Text("Save"),
+                    child: const Text("Yes"),
+                  ),
+                  const SizedBox(width: 10),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Menutup bottom sheet jika batal
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromRGBO(245, 245, 245, 1),
+                      foregroundColor: const Color.fromRGBO(123, 119, 148, 1),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 30),
+                    ),
+                    child: const Text("Cancel"),
                   ),
                 ],
               ),
@@ -371,6 +373,7 @@ class _HomePagePersonalState extends State<HomePagePersonal> {
       },
     );
   }
+
 
   void accessTask(int index){
 
