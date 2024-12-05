@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:listify/screens/verification_screen.dart';
 
-import '../services/api_service.dart';
+import '../services/auth_service.dart';
 
 class ForgetPasswordScreen extends StatefulWidget {
   const ForgetPasswordScreen({super.key});
@@ -12,8 +12,8 @@ class ForgetPasswordScreen extends StatefulWidget {
 
 class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
   final TextEditingController _emailController = TextEditingController();
-  final ApiService _apiService = ApiService();
-
+  final AuthService _apiService = AuthService();
+  bool _isContinue = false;
 
   String? _emailError;
 
@@ -110,13 +110,15 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
                           ),
                           padding: const EdgeInsets.symmetric(vertical: 16),
                         ),
-                        child: const Text(
-                          'CONTINUE',
-                          style: TextStyle(
-                            color: Color.fromRGBO(245, 245, 245, 1),
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        child: _isContinue
+                            ? const CircularProgressIndicator()
+                            : const Text(
+                                'CONTINUE',
+                                style: TextStyle(
+                                  color: Color.fromRGBO(245, 245, 245, 1),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                       ),
                     ),
                   ],
@@ -132,11 +134,15 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
 
   bool _isValidEmail(String email) {
     final RegExp emailRegex =
-    RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+        RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
     return emailRegex.hasMatch(email);
   }
 
   void _handleContinue() async {
+    setState(() {
+      _isContinue = true;
+    });
+
     final email = _emailController.text.trim();
     if (_isValidEmail(email)) {
       setState(() {
@@ -144,6 +150,11 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
       });
 
       final result = await _apiService.forgotPassword(email);
+
+      setState(() {
+        _isContinue = false;
+      });
+
       if (result['success'] == 'true') {
         final message = result['message'];
         ScaffoldMessenger.of(context)
@@ -159,6 +170,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
       }
     } else {
       setState(() {
+        _isContinue = false;
         _emailError = 'Please enter a valid email address';
         FocusScope.of(context).requestFocus(FocusNode());
       });

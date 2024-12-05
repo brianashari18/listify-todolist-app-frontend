@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:listify/screens/login_screen.dart';
-import 'package:listify/services/api_service.dart';
+import 'package:listify/services/auth_service.dart';
 import 'package:listify/services/google_service.dart';
 
 import '../models/user_model.dart';
-import 'homepage_personal_screen.dart';
+import 'homepage_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -18,7 +18,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPassController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
-  final ApiService _apiService = ApiService();
+  final AuthService _apiService = AuthService();
   final GoogleService _googleService = GoogleService();
 
   String? _emailError;
@@ -401,15 +401,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
   void _onLoginGoogle() async {
     final result = await _googleService.login();
     if (result['success'] == 'true') {
-      User user = User(
-          id: result['id'],
-          username: result['username'],
-          email: result['email']);
-
+      User user = result['user'];
       ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Sign In Successfully')));
       Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => HomePagePersonal(user: user)),
+        MaterialPageRoute(builder: (context) => HomepageScreen(user: user)),
             (route) => false,
       );
     } else {

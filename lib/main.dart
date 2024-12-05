@@ -1,28 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:listify/screens/start_screen.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:listify/screens/access_screen.dart';
+import 'package:listify/screens/splash_screen.dart';
+import 'package:listify/screens/subtask_screen.dart';
 
 Future<void> main() async {
   await dotenv.load(fileName: ".env");
-  runApp(const MyApp());
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
-      ),
-      home: const StartScreen()
-    );
+        debugShowCheckedModeBanner: false,
+        title: 'Listify',
+        theme: ThemeData(
+          cardColor: const Color(0xFF7B7794),
+          primaryColorDark: const Color(0xFF44404D),
+          primaryColorLight: const Color(0xFFF5F5F5),
+          primaryColor: const Color(0xFF1E1E2A),
+          primaryTextTheme: GoogleFonts.openSansTextTheme(),
+          textTheme: GoogleFonts.nunitoTextTheme(),
+          useMaterial3: true,
+        ),
+        home: const SplashScreen());
   }
 }
-
-

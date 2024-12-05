@@ -2,8 +2,12 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:listify/services/user_service.dart';
+
+import '../models/user_model.dart';
 
 class GoogleService {
+  final UserService _userService = UserService();
   final _baseUrl = "http://192.168.18.11:8080/api";
   final _googleSignIn =
       GoogleSignIn(clientId: dotenv.env["GOOGLE_WEB_CLIENT_ID"], scopes: [
@@ -20,7 +24,6 @@ class GoogleService {
         final accessToken = googleAuth.accessToken;
 
         if (accessToken != null && idToken != null) {
-          // Send tokens to the backend
           final response = await _sendTokensToBackend(
               accessToken, idToken, _googleSignIn.clientId!, user);
           return response;
@@ -59,11 +62,19 @@ class GoogleService {
 
         if (responseUser.statusCode == 200) {
           final userBody = json.decode(responseUser.body);
+          final userData = userBody['data'];
+
+          final user = User(
+            id: userData['id'],
+            username: userData['username'],
+            email: userData['email'],
+            token: token,
+          );
+          await _userService.saveUser(user);
+
           return {
             'success': 'true',
-            'id': userBody['data']['id'],
-            'email': userBody['data']['email'],
-            'username': userBody['data']['username'],
+            'user': user
           };
         } else if (responseUser.statusCode == 400) {
           final body = json.decode(responseUser.body);
