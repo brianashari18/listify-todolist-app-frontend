@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:listify/screens/forget_password_screen.dart';
-import 'package:listify/screens/homepage_personal_screen.dart';
+import 'package:listify/screens/homepage_screen.dart';
 import 'package:listify/screens/register_screen.dart';
 // import 'package:listify/services/google_service.dart';
 
 import '../models/user_model.dart';
-import '../services/api_service.dart';
+import '../services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -17,8 +17,13 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+<<<<<<< HEAD
   final ApiService _apiService = ApiService();
   // final GoogleService _googleService = GoogleService();
+=======
+  final AuthService _apiService = AuthService();
+  final GoogleService _googleService = GoogleService();
+>>>>>>> f69d7969cbc75843704fd6d183e80b29594ca62e
 
   String? _emailError;
   String? _passwordError;
@@ -245,27 +250,20 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     // Validasi Password
-    if (_emailError == null &&
-        _passwordError == null) {
+    if (_emailError == null && _passwordError == null) {
       final result = await _apiService.login(email, password);
       if (result['success'] == 'true') {
-        User user = User(
-            id: result['id'],
-            username: result['username'],
-            email: result['email']);
-
-        setState(() {
-          _isSignIn = false;
-        });
-
+        User user = result['user'];
+        ScaffoldMessenger.of(context).clearSnackBars();
         ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Sign In Successfully')));
         Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => HomePagePersonal(user: user)),
+          MaterialPageRoute(builder: (context) => HomepageScreen(user: user)),
           (route) => false,
         );
       } else {
         final errorMessage = result['error'];
+        ScaffoldMessenger.of(context).clearSnackBars();
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text(errorMessage)));
       }
@@ -278,6 +276,7 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
+<<<<<<< HEAD
   // void _onLoginGoogle() async {
   //   final result = await _googleService.login();
   //   if (result['success'] == 'true') {
@@ -298,4 +297,24 @@ class _LoginScreenState extends State<LoginScreen> {
   //         .showSnackBar(SnackBar(content: Text(errorMessage)));
   //   }
   // }
+=======
+  void _onLoginGoogle() async {
+    final result = await _googleService.login();
+    if (result['success'] == 'true') {
+      User user = result['user'];
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Sign In Successfully')));
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => HomepageScreen(user: user)),
+        (route) => false,
+      );
+    } else {
+      final errorMessage = result['error'];
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(errorMessage)));
+    }
+  }
+>>>>>>> f69d7969cbc75843704fd6d183e80b29594ca62e
 }

@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 
+import '../models/task_model.dart';
+
 enum Options { Edit, Delete, Access }
 
 class TaskWidget extends StatelessWidget {
   const TaskWidget(
       {super.key,
-      required this.text,
-      required this.color,
+      required this.task,
       required this.onEdit,
       required this.onDelete,
       required this.onAccess,
       required this.index
       });
 
-  final String text;
-  final Color color;
+  final Task task;
   final Function(int index) onEdit;
   final Function(int index) onDelete;
   final Function(int index) onAccess;
@@ -26,7 +26,7 @@ class TaskWidget extends StatelessWidget {
       width: 120, // Lebar container
       height: 120, // Tinggi container
       decoration: BoxDecoration(
-        color: color, // Warna latar menyerupai gambar
+        color: task.color, // Warna latar menyerupai gambar
         borderRadius: BorderRadius.circular(10.0), // Sudut melengkung
       ),
       child: Stack(
@@ -36,7 +36,7 @@ class TaskWidget extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
-                text, // Teks utama
+                task.title, // Teks utama
                 textAlign: TextAlign.center, // Teks di tengah
                 style: const TextStyle(
                   fontSize: 18.0,

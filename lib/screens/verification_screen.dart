@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:listify/screens/reset_password_screen.dart';
 import 'package:listify/widgets/verification_field_widget.dart';
 
-import '../services/api_service.dart';
+import '../services/auth_service.dart';
 
 class VerificationScreen extends StatefulWidget {
   const VerificationScreen({super.key, required this.email});
@@ -18,7 +19,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
   final TextEditingController _textEditingController2 = TextEditingController();
   final TextEditingController _textEditingController3 = TextEditingController();
   final TextEditingController _textEditingController4 = TextEditingController();
-  final ApiService _apiService = ApiService();
+  final AuthService _apiService = AuthService();
   bool _isVerify = false;
   bool _isResend = false;
 
@@ -181,6 +182,11 @@ class _VerificationScreenState extends State<VerificationScreen> {
       final message = result['message'];
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(message)));
+
+      Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(
+              builder: (context) => ResetPasswordScreen(email: widget.email)),
+          (route) => false);
     } else {
       final errorMessage = result['error'];
       ScaffoldMessenger.of(context)
