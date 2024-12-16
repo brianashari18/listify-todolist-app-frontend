@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:listify/screens/helpCenter_screen.dart';
 
 class FeedbackApp extends StatelessWidget {
-  const FeedbackApp({Key? key}) : super(key: key);
+  const FeedbackApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -11,13 +11,13 @@ class FeedbackApp extends StatelessWidget {
       theme: ThemeData.dark().copyWith(
         scaffoldBackgroundColor: const Color(0xFF3C3547),
       ),
-      home: FeedbackPage(),
+      home: const FeedbackPage(),
     );
   }
 }
 
 class FeedbackPage extends StatefulWidget {
-  const FeedbackPage({Key? key}) : super(key: key);
+  const FeedbackPage({super.key});
 
   @override
   State<FeedbackPage> createState() => _FeedbackPageState();
@@ -35,11 +35,16 @@ class _FeedbackPageState extends State<FeedbackPage> {
   void submitForm() {
     setState(() {
       emailError = validateEmail(emailController.text);
-      subjectError = subjectController.text.isEmpty ? "Subject cannot be empty" : null;
-      descriptionError = descriptionController.text.isEmpty ? "Description cannot be empty" : null;
+      subjectError =
+          subjectController.text.isEmpty ? "Subject cannot be empty" : null;
+      descriptionError = descriptionController.text.isEmpty
+          ? "Description cannot be empty"
+          : null;
     });
 
-    if (emailError == null && subjectError == null && descriptionError == null) {
+    if (emailError == null &&
+        subjectError == null &&
+        descriptionError == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Feedback Submitted')),
       );
@@ -67,7 +72,9 @@ class _FeedbackPageState extends State<FeedbackPage> {
           onPressed: () {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => HelpCenter()),  // Assuming HelpCenterPage is your Help Center page
+              MaterialPageRoute(
+                  builder: (context) =>
+                      HelpCenter()), // Assuming HelpCenterPage is your Help Center page
             );
           },
         ),
@@ -107,21 +114,23 @@ class _FeedbackPageState extends State<FeedbackPage> {
               TextField(
                 controller: emailController,
                 style: const TextStyle(color: Colors.white),
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Email Address',
                   hintText: 'name@example.com',
-                  labelStyle: const TextStyle(color: Colors.white),
-                  hintStyle: const TextStyle(color: Colors.white38),
+                  labelStyle: TextStyle(color: Colors.white),
+                  hintStyle: TextStyle(color: Colors.white38),
                   floatingLabelBehavior: FloatingLabelBehavior.always,
                   filled: true,
-                  fillColor: const Color(0xFF4E455A),
-                  enabledBorder: const OutlineInputBorder(
+                  fillColor: Color(0xFF4E455A),
+                  enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(10)),
-                    borderSide: BorderSide(color: Color(0xFF393646)), // Default color
+                    borderSide:
+                        BorderSide(color: Color(0xFF393646)), // Default color
                   ),
-                  focusedBorder: const OutlineInputBorder(
+                  focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(10)),
-                    borderSide: BorderSide(color: Color(0xFF4E455A)), // Focused color
+                    borderSide:
+                        BorderSide(color: Color(0xFF4E455A)), // Focused color
                   ),
                 ),
               ),
@@ -138,19 +147,19 @@ class _FeedbackPageState extends State<FeedbackPage> {
               TextField(
                 controller: subjectController,
                 style: const TextStyle(color: Colors.white),
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Subject',
                   hintText: 'Enter your subject',
-                  labelStyle: const TextStyle(color: Colors.white),
-                  hintStyle: const TextStyle(color: Colors.white38),
+                  labelStyle: TextStyle(color: Colors.white),
+                  hintStyle: TextStyle(color: Colors.white38),
                   floatingLabelBehavior: FloatingLabelBehavior.always,
                   filled: true,
-                  fillColor: const Color(0xFF4E455A),
-                  enabledBorder: const OutlineInputBorder(
+                  fillColor: Color(0xFF4E455A),
+                  enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(10)),
                     borderSide: BorderSide(color: Color(0xFF393646)),
                   ),
-                  focusedBorder: const OutlineInputBorder(
+                  focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(10)),
                     borderSide: BorderSide(color: Color(0xFF4E455A)),
                   ),
@@ -170,19 +179,19 @@ class _FeedbackPageState extends State<FeedbackPage> {
                 controller: descriptionController,
                 maxLines: 5,
                 style: const TextStyle(color: Colors.white),
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Description',
                   hintText: 'Enter your description',
-                  labelStyle: const TextStyle(color: Colors.white),
-                  hintStyle: const TextStyle(color: Colors.white38),
+                  labelStyle: TextStyle(color: Colors.white),
+                  hintStyle: TextStyle(color: Colors.white38),
                   floatingLabelBehavior: FloatingLabelBehavior.always,
                   filled: true,
-                  fillColor: const Color(0xFF4E455A),
-                  enabledBorder: const OutlineInputBorder(
+                  fillColor: Color(0xFF4E455A),
+                  enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(10)),
                     borderSide: BorderSide(color: Color(0xFF393646)),
                   ),
-                  focusedBorder: const OutlineInputBorder(
+                  focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(10)),
                     borderSide: BorderSide(color: Color(0xFF4E455A)),
                   ),

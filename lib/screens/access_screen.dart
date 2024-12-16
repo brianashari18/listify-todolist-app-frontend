@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../models/task_model.dart';
-import '../models/user_model.dart';
-
 class AccessScreen extends StatefulWidget {
   const AccessScreen({super.key});
-
 
   @override
   State<AccessScreen> createState() => _AccessScreenState();
@@ -224,7 +220,7 @@ class _AccessScreenState extends State<AccessScreen> {
                           // Ensure the Row only takes necessary space
                           children: [
                             Text(
-                              'owner',
+                              'View',
                               style: Theme.of(context)
                                   .primaryTextTheme
                                   .bodyMedium!

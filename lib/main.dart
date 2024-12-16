@@ -9,18 +9,9 @@ import 'package:listify/screens/helpCenter_screen.dart';
 import 'package:listify/screens/login_screen.dart';
 import 'package:listify/screens/register_screen.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-<<<<<<< HEAD
-import 'package:listify/screens/search-filter.dart';
-import 'package:listify/screens/setting_screen.dart';
-import 'package:listify/screens/start_screen.dart';
-import 'package:listify/screens/subtask_screen.dart';
-// import 'package:listify/screens/subtask.dart';
-import 'package:listify/screens/search-filter.dart';
-=======
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:listify/screens/splash_screen.dart';
->>>>>>> f69d7969cbc75843704fd6d183e80b29594ca62e
 
 Future<void> main() async {
   await dotenv.load(fileName: ".env");
@@ -33,16 +24,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-<<<<<<< HEAD
-      debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
-      ),
-      home: SubTask(),
-    );
-=======
         debugShowCheckedModeBanner: false,
         title: 'Listify',
         theme: ThemeData(
@@ -55,6 +36,5 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
         ),
         home: const SplashScreen());
->>>>>>> f69d7969cbc75843704fd6d183e80b29594ca62e
   }
 }

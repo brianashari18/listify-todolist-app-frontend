@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:listify/screens/login_screen.dart';
 import 'package:listify/screens/reset_success_screen.dart';
 import 'package:listify/services/auth_service.dart';
 

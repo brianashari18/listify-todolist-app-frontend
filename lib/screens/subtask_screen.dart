@@ -6,9 +6,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: const SubTask(),
+      home: SubTask(),
     );
   }
 }
@@ -48,13 +48,13 @@ class _SubTaskState extends State<SubTask> {
       setState(() {
         _selectedDate = selectedDate;
         _deadlineController.text =
-        "${selectedDate.day}/${selectedDate.month}/${selectedDate.year}";
+            "${selectedDate.day}/${selectedDate.month}/${selectedDate.year}";
       });
     }
   }
 
   void addTask() {
-    final TextEditingController _taskController = TextEditingController();
+    final TextEditingController taskController = TextEditingController();
 
     showModalBottomSheet(
       context: context,
@@ -89,14 +89,16 @@ class _SubTaskState extends State<SubTask> {
                 ),
                 const SizedBox(height: 20),
                 TextField(
-                  controller: _taskController,
+                  controller: taskController,
                   decoration: InputDecoration(
                     hintText: "Enter task",
-                    hintStyle: const TextStyle(fontSize: 14, color: Colors.black45),
+                    hintStyle:
+                        const TextStyle(fontSize: 14, color: Colors.black45),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                    contentPadding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 10),
                     filled: true,
                     fillColor: const Color.fromRGBO(191, 191, 191, 1),
                   ),
@@ -108,11 +110,13 @@ class _SubTaskState extends State<SubTask> {
                   onTap: () => _showCalendarModal(context),
                   decoration: InputDecoration(
                     hintText: "Deadline",
-                    hintStyle: const TextStyle(fontSize: 14, color: Colors.black45),
+                    hintStyle:
+                        const TextStyle(fontSize: 14, color: Colors.black45),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                    contentPadding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 10),
                     filled: true,
                     fillColor: const Color.fromRGBO(191, 191, 191, 1),
                     suffixIcon: const Icon(Icons.calendar_today),
@@ -148,17 +152,17 @@ class _SubTaskState extends State<SubTask> {
                   children: [
                     ElevatedButton(
                       onPressed: () {
-                        if (_taskController.text.isNotEmpty &&
+                        if (taskController.text.isNotEmpty &&
                             _deadlineController.text.isNotEmpty &&
                             _selectedStatus != null) {
                           setState(() {
                             tasks.add({
-                              "task": _taskController.text,
+                              "task": taskController.text,
                               "deadline": _deadlineController.text,
                               "status": _selectedStatus,
                               "done": false,
                             });
-                            _taskController.clear();
+                            taskController.clear();
                             _deadlineController.clear();
                             _selectedStatus = null;
                           });
@@ -171,7 +175,8 @@ class _SubTaskState extends State<SubTask> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 30),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 30),
                       ),
                       child: const Text("Done"),
                     ),
@@ -192,13 +197,14 @@ class _SubTaskState extends State<SubTask> {
 
       // Menyusun ulang daftar tasks: tasks yang belum selesai di awal, dan tasks yang selesai di akhir
       tasks.sort((a, b) {
-        if (a["done"] && !b["done"]) return 1; // Pindahkan tugas selesai setelah tugas belum selesai
-        if (!a["done"] && b["done"]) return -1; // Tetap tugas belum selesai sebelum tugas selesai
+        if (a["done"] && !b["done"])
+          return 1; // Pindahkan tugas selesai setelah tugas belum selesai
+        if (!a["done"] && b["done"])
+          return -1; // Tetap tugas belum selesai sebelum tugas selesai
         return 0; // Jaga urutan relatif jika keduanya sama
       });
     });
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -245,9 +251,9 @@ class _SubTaskState extends State<SubTask> {
             child: FloatingActionButton(
               onPressed: addTask,
               backgroundColor: Colors.white,
-              child: const Icon(Icons.add, color: Colors.black),
               shape: const CircleBorder(),
               elevation: 6,
+              child: const Icon(Icons.add, color: Colors.black),
             ),
           ),
           Positioned(
@@ -274,14 +280,16 @@ class _SubTaskState extends State<SubTask> {
                           tasks[index]["done"]
                               ? Icons.check_circle
                               : Icons.circle_outlined,
-                          color: tasks[index]["done"] ? Colors.green : Colors.grey,
+                          color:
+                              tasks[index]["done"] ? Colors.green : Colors.grey,
                         ),
                       ),
                     ),
                     title: Text(
                       "${tasks[index]["task"]} | ${tasks[index]["deadline"]} | ${tasks[index]["status"]}",
                       style: TextStyle(
-                        color: tasks[index]["done"] ? Colors.grey : Colors.white,
+                        color:
+                            tasks[index]["done"] ? Colors.grey : Colors.white,
                         decoration: tasks[index]["done"]
                             ? TextDecoration.lineThrough
                             : TextDecoration.none,
@@ -307,6 +315,8 @@ class _SubTaskState extends State<SubTask> {
 }
 
 class CalendarBottomSheet extends StatefulWidget {
+  const CalendarBottomSheet({super.key});
+
   @override
   State<CalendarBottomSheet> createState() => _CalendarBottomSheetState();
 }

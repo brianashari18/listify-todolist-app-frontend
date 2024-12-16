@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:listify/screens/start_screen.dart';
@@ -9,7 +8,6 @@ import 'package:listify/widgets/side_drawer.dart';
 import 'package:listify/widgets/task_widget.dart';
 import '../models/task_model.dart';
 import '../models/user_model.dart';
-import '../services/auth_service.dart';
 
 class HomepageScreen extends StatefulWidget {
   const HomepageScreen({super.key, required this.user});

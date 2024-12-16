@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:listify/screens/login_screen.dart';
-<<<<<<< HEAD
-import 'package:listify/services/api_service.dart';
-// import 'package:listify/services/google_service.dart';
-=======
+
 import 'package:listify/services/auth_service.dart';
 import 'package:listify/services/google_service.dart';
->>>>>>> f69d7969cbc75843704fd6d183e80b29594ca62e
 
 import '../models/user_model.dart';
 import 'homepage_screen.dart';
@@ -23,13 +19,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPassController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
-<<<<<<< HEAD
-  final ApiService _apiService = ApiService();
-  // final GoogleService _googleService = GoogleService();
-=======
   final AuthService _apiService = AuthService();
   final GoogleService _googleService = GoogleService();
->>>>>>> f69d7969cbc75843704fd6d183e80b29594ca62e
 
   String? _emailError;
   String? _usernameError;
@@ -282,8 +273,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   const SizedBox(height: 15),
                   GestureDetector(
                     onTap: () {
-                      // _onLoginGoogle();
-                      // _googleService.logout();
+                      _onLoginGoogle();
+                      _googleService.logout();
                     },
                     child: Image.asset(
                       'assets/icons/google.png',
@@ -408,28 +399,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-<<<<<<< HEAD
-//   // void _onLoginGoogle() async {
-//   //   final result = await _googleService.login();
-//   //   if (result['success'] == 'true') {
-//   //     User user = User(
-//   //         id: result['id'],
-//   //         username: result['username'],
-//   //         email: result['email']);
-//   //
-//   //     ScaffoldMessenger.of(context).showSnackBar(
-//   //         const SnackBar(content: Text('Sign In Successfully')));
-//   //     Navigator.of(context).pushAndRemoveUntil(
-//   //       MaterialPageRoute(builder: (context) => HomePagePersonal(user: user)),
-//   //           (route) => false,
-//   //     );
-//     } else {
-//       final errorMessage = result['error'];
-//       ScaffoldMessenger.of(context)
-//           .showSnackBar(SnackBar(content: Text(errorMessage)));
-//     }
-//   }
-=======
   void _onLoginGoogle() async {
     final result = await _googleService.login();
     if (result['success'] == 'true') {
@@ -446,5 +415,4 @@ class _RegisterScreenState extends State<RegisterScreen> {
           .showSnackBar(SnackBar(content: Text(errorMessage)));
     }
   }
->>>>>>> f69d7969cbc75843704fd6d183e80b29594ca62e
 }

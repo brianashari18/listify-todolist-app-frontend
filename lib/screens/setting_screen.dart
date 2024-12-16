@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class settingPage extends StatefulWidget {
+  const settingPage({super.key});
+
   @override
   _settingPageState createState() => _settingPageState();
 }
@@ -60,7 +62,7 @@ class _settingPageState extends State<settingPage> {
                 moveCheckedItems = value;
               });
             },
-            activeColor: const Color(0x7B7794),
+            activeColor: const Color(0x007b7794),
             inactiveThumbColor: Colors.white,
             inactiveTrackColor: const Color(0xFF393646),
           ),
@@ -75,7 +77,7 @@ class _settingPageState extends State<settingPage> {
                 moveImportantItems = value;
               });
             },
-            activeColor: const Color(0x7B7794),
+            activeColor: const Color(0x007b7794),
             inactiveThumbColor: Colors.white,
             inactiveTrackColor: const Color(0xFF393646),
           ),
@@ -103,7 +105,7 @@ class _settingPageState extends State<settingPage> {
                 enableAI = value; // Update the state when toggle is changed
               });
             },
-            activeColor: const Color(0x7B7794),
+            activeColor: const Color(0x007b7794),
             inactiveThumbColor: Colors.white,
             inactiveTrackColor: const Color(0xFF393646),
           ),

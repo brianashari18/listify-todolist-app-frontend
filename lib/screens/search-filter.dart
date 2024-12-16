@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class FilterScreen extends StatefulWidget {
+  const FilterScreen({super.key});
+
   @override
   _FilterScreenState createState() => _FilterScreenState();
 }
@@ -11,12 +13,11 @@ class _FilterScreenState extends State<FilterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF393646), // Warna background ungu tua
+      backgroundColor: const Color(0xFF393646), // Warna background ungu tua
       appBar: AppBar(
-        backgroundColor: Color(0xFF393646),
+        backgroundColor: const Color(0xFF393646),
         elevation: 0,
         automaticallyImplyLeading: false,
-
       ),
       body: Padding(
         padding: const EdgeInsets.only(top: 4.0, left: 16.0, right: 16.0),
@@ -29,15 +30,16 @@ class _FilterScreenState extends State<FilterScreen> {
                 hintText: "Search your task",
                 filled: true,
                 fillColor: Colors.white,
-                prefixIcon: Icon(Icons.arrow_back),
+                prefixIcon: const Icon(Icons.arrow_back),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(28),
                   borderSide: BorderSide.none,
                 ),
-                contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                contentPadding:
+                    const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
 
             // Filter Buttons
             Row(
@@ -69,12 +71,12 @@ class _FilterScreenState extends State<FilterScreen> {
                     }),
               ],
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
 
             // Grid View
             Expanded(
               child: GridView.builder(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
                   crossAxisSpacing: 16,
                   mainAxisSpacing: 16,
@@ -103,7 +105,8 @@ class FilterButton extends StatelessWidget {
   final bool isSelected;
   final VoidCallback onTap;
 
-  FilterButton({
+  const FilterButton({
+    super.key,
     required this.title,
     required this.isSelected,
     required this.onTap,
@@ -114,14 +117,14 @@ class FilterButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? Color(0xFF6D5D6E) : Color(0xFF4F4557),
+          color: isSelected ? const Color(0xFF6D5D6E) : const Color(0xFF4F4557),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Text(
           title,
-          style: TextStyle(
+          style: const TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.w500,
           ),

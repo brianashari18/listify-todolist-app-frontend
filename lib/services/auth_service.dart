@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:listify/services/user_service.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/user_model.dart';
 
@@ -43,10 +42,7 @@ class AuthService {
           );
           await _userService.saveUser(user);
 
-          return {
-            'success': 'true',
-            'user': user
-          };
+          return {'success': 'true', 'user': user};
         } else if (responseUser.statusCode == 400) {
           final body = json.decode(responseUser.body);
           return {'success': false, 'error': body['errors']};

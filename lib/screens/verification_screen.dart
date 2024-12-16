@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:listify/screens/reset_password_screen.dart';
 import 'package:listify/widgets/verification_field_widget.dart';
 
