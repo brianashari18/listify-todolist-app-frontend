@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'dart:convert'; // Untuk mengubah data ke format JSON
-import 'package:http/http.dart' as http;
 import 'package:listify/screens/login_screen.dart';
 import 'package:listify/services/api_service.dart';
+// import 'package:listify/services/google_service.dart';
+
+import '../models/user_model.dart';
+import 'homepage_personal_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -16,6 +18,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPassController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
+  final ApiService _apiService = ApiService();
+  // final GoogleService _googleService = GoogleService();
 
   String? _emailError;
   String? _usernameError;
@@ -28,6 +32,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _hasLowerCase = false;
   bool _hasNumber = false;
   bool _hasSpecialCharacter = false;
+  bool _isRegister = false;
 
   @override
   void dispose() {
@@ -35,129 +40,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     _passwordController.dispose();
     _confirmPassController.dispose();
     super.dispose();
-  }
-
-  bool _isValidEmail(String email) {
-    final RegExp emailRegex =
-    RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
-    return emailRegex.hasMatch(email);
-  }
-
-  void _checkPassword(String password) {
-    setState(() {
-      _isMinLength = password.length >= 8;
-      _hasUpperCase = password.contains(RegExp(r'[A-Z]'));
-      _hasLowerCase = password.contains(RegExp(r'[a-z]'));
-      _hasNumber = password.contains(RegExp(r'\d'));
-      _hasSpecialCharacter =
-          password.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'));
-    });
-  }
-
-  void _validateInputs() async {
-    final email = _emailController.text;
-    final password = _passwordController.text;
-    final confirmPassword = _confirmPassController.text;
-    final username = _usernameController.text;
-
-    setState(() {
-      _emailError = null;
-      _usernameError = null;
-      _passwordError = null;
-      _confirmPasswordError = null;
-
-      if (email.isEmpty || !_isValidEmail(email)) {
-        _emailError = 'Enter a valid email address';
-        FocusScope.of(context).requestFocus(FocusNode());
-      }
-
-      if (username.isEmpty) {
-        _usernameError = 'Username cannot be empty';
-        FocusScope.of(context).requestFocus(FocusNode());
-      } else if (username.length < 3) {
-        _usernameError = "Username must be at least 3 characters";
-        FocusScope.of(context).requestFocus(FocusNode());
-      }
-    });
-
-    if (password != confirmPassword) {
-      // Check if passwords match
-      _confirmPasswordError = 'Passwords do not match';
-      FocusScope.of(context).requestFocus(FocusNode());
-    }
-
-    // Validasi Password
-    if (_emailError == null &&
-        _usernameError == null &&
-        _passwordError == null &&
-        _confirmPasswordError == null &&
-        _isMinLength &&
-        _hasUpperCase &&
-        _hasLowerCase &&
-        _hasNumber &&
-        _hasSpecialCharacter) {
-      // Jika validasi berhasil, kirim data ke backend
-      try {
-        final requestBody = <String, dynamic>{
-          "username": username,
-          "email": email,
-          "password": password,
-          "confirmPassword": confirmPassword
-        };
-        final responseInput =
-        await ApiService.register("/api/users/register", requestBody);
-
-        if (responseInput.statusCode == 200) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Registrasi Successful")),
-          );
-
-          print("Response: ${responseInput.body}");
-
-          if (!context.mounted) {
-            return;
-          }
-
-          Navigator.of(context).push(
-              MaterialPageRoute(builder: (builder) => const LoginScreen()));
-        } else {
-          // Registrasi gagal
-          final responseData = jsonDecode(responseInput.body);
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Registrasi Failed")),
-          );
-          print("Error: ${responseInput.body}");
-        }
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("An error occurred. Please try again.")),
-        );
-        print("Exception: $e");
-      }
-    } else {
-      print('Registrasi Failed');
-    }
-  }
-
-  Widget _buildPasswordCriteria({required String text, required bool isValid}) {
-    return Row(
-      children: [
-        Icon(
-          isValid ? Icons.check_circle : Icons.cancel,
-          color: isValid ? Colors.green : Colors.red,
-          size: 20,
-        ),
-        const SizedBox(width: 8),
-        Text(
-          text,
-          style: TextStyle(
-            color: isValid ? Colors.green : Colors.red,
-            fontSize: 14,
-            fontWeight: isValid ? FontWeight.w600 : FontWeight.normal,
-          ),
-        ),
-      ],
-    );
   }
 
   @override
@@ -301,7 +183,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           onPressed: () {
                             setState(() {
                               _obscureConfirmPassword =
-                              !_obscureConfirmPassword;
+                                  !_obscureConfirmPassword;
                             });
                           },
                         ),
@@ -348,13 +230,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      child: const Text(
-                        'SIGN UP',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Color.fromRGBO(245, 245, 245, 1),
-                        ),
-                      ),
+                      child: _isRegister
+                          ? const CircularProgressIndicator()
+                          : const Text(
+                              'SIGN UP',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Color.fromRGBO(245, 245, 245, 1),
+                              ),
+                            ),
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -387,7 +271,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   const SizedBox(height: 15),
                   GestureDetector(
-                    onTap: (){},
+                    onTap: () {
+                      // _onLoginGoogle();
+                      // _googleService.logout();
+                    },
                     child: Image.asset(
                       'assets/icons/google.png',
                       height: 40,
@@ -401,4 +288,134 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ),
     );
   }
+
+  bool _isValidEmail(String email) {
+    final RegExp emailRegex =
+        RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+    return emailRegex.hasMatch(email);
+  }
+
+  void _checkPassword(String password) {
+    setState(() {
+      _isMinLength = password.length >= 8;
+      _hasUpperCase = password.contains(RegExp(r'[A-Z]'));
+      _hasLowerCase = password.contains(RegExp(r'[a-z]'));
+      _hasNumber = password.contains(RegExp(r'\d'));
+      _hasSpecialCharacter =
+          password.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'));
+    });
+  }
+
+  void _validateInputs() async {
+    _isRegister = true;
+
+    final email = _emailController.text;
+    final password = _passwordController.text;
+    final confirmPassword = _confirmPassController.text;
+    final username = _usernameController.text;
+
+    setState(() {
+      _emailError = null;
+      _usernameError = null;
+      _passwordError = null;
+      _confirmPasswordError = null;
+
+      if (email.isEmpty || !_isValidEmail(email)) {
+        _emailError = 'Enter a valid email address';
+        FocusScope.of(context).requestFocus(FocusNode());
+      }
+
+      if (username.isEmpty) {
+        _usernameError = 'Username cannot be empty';
+        FocusScope.of(context).requestFocus(FocusNode());
+      } else if (username.length < 3) {
+        _usernameError = "Username must be at least 3 characters";
+        FocusScope.of(context).requestFocus(FocusNode());
+      }
+    });
+
+    if (password != confirmPassword) {
+      // Check if passwords match
+      _confirmPasswordError = 'Passwords do not match';
+      FocusScope.of(context).requestFocus(FocusNode());
+    }
+
+    // Validasi Password
+    if (_emailError == null &&
+        _usernameError == null &&
+        _passwordError == null &&
+        _confirmPasswordError == null &&
+        _isMinLength &&
+        _hasUpperCase &&
+        _hasLowerCase &&
+        _hasNumber &&
+        _hasSpecialCharacter) {
+      // Jika validasi berhasil, kirim data ke backend
+
+      final result = await _apiService.register(
+          email, username, password, confirmPassword);
+
+      setState(() {
+        _isRegister = false;
+      });
+      if (result['success'] == 'true') {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Sign Up Successfully')));
+        Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => const LoginScreen()));
+      } else {
+        final errorMessage = result['error'];
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(errorMessage)));
+      }
+    } else {
+      print('Registrasi Failed');
+    }
+
+    setState(() {
+      _isRegister = false;
+    });
+  }
+
+  Widget _buildPasswordCriteria({required String text, required bool isValid}) {
+    return Row(
+      children: [
+        Icon(
+          isValid ? Icons.check_circle : Icons.cancel,
+          color: isValid ? Colors.green : Colors.red,
+          size: 20,
+        ),
+        const SizedBox(width: 8),
+        Text(
+          text,
+          style: TextStyle(
+            color: isValid ? Colors.green : Colors.red,
+            fontSize: 14,
+            fontWeight: isValid ? FontWeight.w600 : FontWeight.normal,
+          ),
+        ),
+      ],
+    );
+  }
+
+//   // void _onLoginGoogle() async {
+//   //   final result = await _googleService.login();
+//   //   if (result['success'] == 'true') {
+//   //     User user = User(
+//   //         id: result['id'],
+//   //         username: result['username'],
+//   //         email: result['email']);
+//   //
+//   //     ScaffoldMessenger.of(context).showSnackBar(
+//   //         const SnackBar(content: Text('Sign In Successfully')));
+//   //     Navigator.of(context).pushAndRemoveUntil(
+//   //       MaterialPageRoute(builder: (context) => HomePagePersonal(user: user)),
+//   //           (route) => false,
+//   //     );
+//     } else {
+//       final errorMessage = result['error'];
+//       ScaffoldMessenger.of(context)
+//           .showSnackBar(SnackBar(content: Text(errorMessage)));
+//     }
+//   }
 }

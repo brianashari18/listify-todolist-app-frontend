@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'dart:convert';
-import 'package:listify/screens/homepagePersonal_screen.dart';
+import 'package:listify/screens/forget_password_screen.dart';
+import 'package:listify/screens/homepage_personal_screen.dart';
+import 'package:listify/screens/register_screen.dart';
+// import 'package:listify/services/google_service.dart';
 
 import '../models/user_model.dart';
 import '../services/api_service.dart';
@@ -15,149 +17,19 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final ApiService _apiService = ApiService();
+  // final GoogleService _googleService = GoogleService();
 
   String? _emailError;
+  String? _passwordError;
   bool _obscurePassword = true;
-  bool _isMinLength = false;
-  bool _hasUpperCase = false;
-  bool _hasLowerCase = false;
-  bool _hasNumber = false;
-  bool _hasSpecialCharacter = false;
+  bool _isSignIn = false;
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
-  }
-
-  bool _isValidEmail(String email) {
-    final RegExp emailRegex =
-        RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
-    return emailRegex.hasMatch(email);
-  }
-
-  void _checkPassword(String password) {
-    setState(() {
-      _isMinLength = password.length >= 8;
-      _hasUpperCase = password.contains(RegExp(r'[A-Z]'));
-      _hasLowerCase = password.contains(RegExp(r'[a-z]'));
-      _hasNumber = password.contains(RegExp(r'\d'));
-      _hasSpecialCharacter =
-          password.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'));
-    });
-  }
-
-  void _validateInputs() async {
-    final email = _emailController.text;
-    final password = _passwordController.text;
-
-    setState(() {
-      _emailError = null;
-
-      if (email.isEmpty || !_isValidEmail(email)) {
-        _emailError = 'Enter a valid email address';
-        FocusScope.of(context).requestFocus(FocusNode());
-      }
-    });
-
-    // Validasi Password
-    if (_emailError == null &&
-        _isMinLength &&
-        _hasUpperCase &&
-        _hasLowerCase &&
-        _hasNumber &&
-        _hasSpecialCharacter) {
-      // Jika validasi berhasil, kirim data ke backend
-      try {
-        final requestBody = <String, dynamic>{
-          "email": email,
-          "password": password,
-        };
-        final response =
-            await ApiService.login("/api/users/login", requestBody);
-
-        if (response.statusCode == 200) {
-          // Login berhasil
-          ScaffoldMessenger.of(context)
-              .showSnackBar(const SnackBar(content: Text("Login Successful")));
-
-          final Map<String, dynamic> responseBody = jsonDecode(response.body);
-          print("Response: $responseBody");
-
-          final accessToken = responseBody['data']['token'];
-          final responseUser =
-              await ApiService.getCurrent("/api/users/current", accessToken);
-
-          if (responseUser.statusCode == 200) {
-            final Map<String, dynamic> responseData =
-                jsonDecode(responseUser.body);
-            final data = responseData["data"];
-            print("User data: $data");
-
-            User user = User(
-                id: data["id"],
-                username: data["username"],
-                email: data["email"]);
-
-            Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(
-                    builder: (context) => HomePagePersonal(
-                          user: user,
-                        )),
-                (Route<dynamic> route) => false);
-          } else if (responseUser.statusCode == 401) {
-            // Jika status code 401 (Unauthorized), artinya akses token tidak valid atau telah kedaluwarsa
-            print("Unauthorized access. Please login again.");
-            // Arahkan ke layar login atau tampilkan pesan kesalahan
-          } else if (responseUser.statusCode == 404) {
-            // Jika status code 404 (Not Found), artinya endpoint tidak ditemukan
-            print("User not found.");
-          } else if (responseUser.statusCode == 500) {
-            // Jika status code 500 (Internal Server Error), artinya ada masalah di server
-            print("Internal server error. Please try again later.");
-          } else {
-            // Menangani status code lain yang mungkin terjadi
-            print(
-                "Unexpected error occurred. Status code: ${responseUser.statusCode}");
-          }
-        } else {
-          // Login gagal
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Login Failed")),
-          );
-          print("Error: ${response.body}");
-        }
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("$e.")),
-        );
-        print("Exception: $e");
-      }
-    } else {
-      print('Login Failed');
-    }
-  }
-
-  Widget _buildPasswordCriteria({required String text, required bool isValid}) {
-    return Row(
-      children: [
-        Icon(
-          isValid ? Icons.check_circle : Icons.cancel,
-          color: isValid ? Colors.green : Colors.red,
-          size: 20,
-        ),
-        const SizedBox(width: 8),
-        Text(
-          text,
-          style: TextStyle(
-            color: isValid ? Colors.green : Colors.red,
-            fontSize: 14,
-            fontWeight: isValid ? FontWeight.w600 : FontWeight.normal,
-          ),
-        ),
-      ],
-    );
   }
 
   @override
@@ -221,7 +93,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: TextField(
                       controller: _passwordController,
                       obscureText: _obscurePassword,
-                      onChanged: _checkPassword,
                       decoration: InputDecoration(
                         labelText: 'Password',
                         labelStyle: const TextStyle(
@@ -245,6 +116,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         filled: true,
                         fillColor: Colors.white,
+                        errorText: _passwordError,
                       ),
                     ),
                   ),
@@ -253,7 +125,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     alignment: Alignment.centerRight,
                     child: InkWell(
                       onTap: () {
-                        // Tambahkan aksi untuk lupa password
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) =>
+                                const ForgetPasswordScreen()));
                       },
                       splashColor: Colors.transparent,
                       highlightColor: Colors.transparent,
@@ -270,33 +144,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 10),
-                  const Text(
-                    "Password must meet the following criteria:",
-                    style: TextStyle(fontSize: 14, color: Colors.black54),
-                  ),
-                  const SizedBox(height: 10),
-                  _buildPasswordCriteria(
-                    text: "Min. 8 characters",
-                    isValid: _isMinLength,
-                  ),
-                  _buildPasswordCriteria(
-                    text: "Include uppercase letter",
-                    isValid: _hasUpperCase,
-                  ),
-                  _buildPasswordCriteria(
-                    text: "Include lowercase letter",
-                    isValid: _hasLowerCase,
-                  ),
-                  _buildPasswordCriteria(
-                    text: "Include number",
-                    isValid: _hasNumber,
-                  ),
-                  _buildPasswordCriteria(
-                    text: "Include a special character",
-                    isValid: _hasSpecialCharacter,
-                  ),
-                  const SizedBox(height: 75),
+                  const SizedBox(height: 250),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
@@ -308,21 +156,24 @@ class _LoginScreenState extends State<LoginScreen> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      child: const Text(
-                        'SIGN IN',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Color.fromRGBO(245, 245, 245, 1),
-                        ),
-                      ),
+                      child: _isSignIn
+                          ? const CircularProgressIndicator()
+                          : const Text(
+                              'SIGN IN',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Color.fromRGBO(245, 245, 245, 1),
+                              ),
+                            ),
                     ),
                   ),
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 20),
                   Align(
                     alignment: Alignment.center,
                     child: InkWell(
                       onTap: () {
-                        // Tambahkan aksi untuk pendaftaran akun baru
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => const RegisterScreen()));
                       },
                       splashColor: Colors.transparent,
                       highlightColor: Colors.transparent,
@@ -339,14 +190,17 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 50),
+                  const SizedBox(height: 30),
                   const Text(
                     'Or continue with',
                     style: TextStyle(color: Color.fromRGBO(68, 64, 77, 1)),
                   ),
                   const SizedBox(height: 15),
                   GestureDetector(
-                    onTap: (){},
+                    onTap: () {
+                      // _onLoginGoogle();
+                      // _googleService.logout();
+                    },
                     child: Image.asset(
                       'assets/icons/google.png',
                       height: 40,
@@ -360,4 +214,88 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
+
+  bool _isValidEmail(String email) {
+    final RegExp emailRegex =
+        RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+    return emailRegex.hasMatch(email);
+  }
+
+  void _validateInputs() async {
+    setState(() {
+      _isSignIn = true;
+    });
+
+    final email = _emailController.text;
+    final password = _passwordController.text;
+
+    setState(() {
+      _emailError = null;
+      _passwordError = null;
+
+      if (email.isEmpty || !_isValidEmail(email)) {
+        _emailError = 'Enter a valid email address';
+        FocusScope.of(context).requestFocus(FocusNode());
+      }
+    });
+
+    if (password.isEmpty) {
+      _passwordError = 'Password cannot be empty';
+      FocusScope.of(context).requestFocus(FocusNode());
+    }
+
+    // Validasi Password
+    if (_emailError == null &&
+        _passwordError == null) {
+      final result = await _apiService.login(email, password);
+      if (result['success'] == 'true') {
+        User user = User(
+            id: result['id'],
+            username: result['username'],
+            email: result['email']);
+
+        setState(() {
+          _isSignIn = false;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Sign In Successfully')));
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => HomePagePersonal(user: user)),
+          (route) => false,
+        );
+      } else {
+        final errorMessage = result['error'];
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(errorMessage)));
+      }
+    } else {
+      print('Login Failed');
+    }
+
+    setState(() {
+      _isSignIn = false;
+    });
+  }
+
+  // void _onLoginGoogle() async {
+  //   final result = await _googleService.login();
+  //   if (result['success'] == 'true') {
+  //     User user = User(
+  //         id: result['id'],
+  //         username: result['username'],
+  //         email: result['email']);
+  //
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //         const SnackBar(content: Text('Sign In Successfully')));
+  //     Navigator.of(context).pushAndRemoveUntil(
+  //       MaterialPageRoute(builder: (context) => HomePagePersonal(user: user)),
+  //           (route) => false,
+  //     );
+  //   } else {
+  //     final errorMessage = result['error'];
+  //     ScaffoldMessenger.of(context)
+  //         .showSnackBar(SnackBar(content: Text(errorMessage)));
+  //   }
+  // }
 }

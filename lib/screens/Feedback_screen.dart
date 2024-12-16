@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:listify/screens/helpCenter_screen.dart';
 
 class FeedbackApp extends StatelessWidget {
   const FeedbackApp({Key? key}) : super(key: key);
@@ -64,7 +65,10 @@ class _FeedbackPageState extends State<FeedbackPage> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => HelpCenter()),  // Assuming HelpCenterPage is your Help Center page
+            );
           },
         ),
         toolbarHeight: 90,
