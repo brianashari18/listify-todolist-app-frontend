@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/access_provider.dart';
 import '../providers/resource_provider.dart';
 import '../widgets/calendar_bottom_sheet.dart';
 
@@ -18,6 +19,21 @@ class _SubTaskState extends ConsumerState<SubTask> {
   DateTime? _selectedDate;
 
   @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      final user = ref.read(userProvider);
+      final task = ref.read(activeTaskProvider);
+
+      if (user != null && task != null) {
+        ref.read(accessProvider.notifier).fetchAccess(user, task);
+      } else {
+        debugPrint('User or Task is null in TaskWidget.');
+      }
+    });
+  }
+
+  @override
   void dispose() {
     _subtaskController.dispose();
     _deadlineController.dispose();
@@ -26,8 +42,14 @@ class _SubTaskState extends ConsumerState<SubTask> {
 
   @override
   Widget build(BuildContext context) {
+    final accessState = ref.watch(accessProvider);
     final user = ref.read(userProvider);
     final task = ref.read(activeTaskProvider);
+
+    if (accessState['accessList'] == null || user == null) {
+      return const CircularProgressIndicator();
+    }
+
     return Scaffold(
       backgroundColor: const Color.fromRGBO(68, 64, 77, 1),
       body: Stack(
@@ -53,8 +75,8 @@ class _SubTaskState extends ConsumerState<SubTask> {
                     },
                   ),
                   const SizedBox(height: 20),
-                  const Text(
-                    "Project Management",
+                   Text(
+                    task!.title,
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 40,
