@@ -56,39 +56,41 @@ class _SubTaskState extends ConsumerState<SubTask> {
         clipBehavior: Clip.none,
         children: [
           ClipRRect(
-            borderRadius: const BorderRadius.only(
-              bottomLeft: Radius.circular(30),
-              bottomRight: Radius.circular(30),
-            ),
-            child: Container(
-              height: 260,
-              width: double.infinity,
-              color: const Color.fromRGBO(123, 119, 148, 1),
-              padding: const EdgeInsets.fromLTRB(16.0, 40.0, 16.0, 20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back, color: Colors.white),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                  ),
-                  const SizedBox(height: 20),
-                   Text(
-                    task!.title,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 40,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
+              borderRadius: const BorderRadius.only(
+                bottomLeft: Radius.circular(30),
+                bottomRight: Radius.circular(30),
               ),
-            ),
+              child: Container(
+                height: 300,
+                width: double.infinity,
+                color: const Color.fromRGBO(123, 119, 148, 1),
+                padding: const EdgeInsets.fromLTRB(16.0, 40.0, 16.0, 20.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back, color: Colors.white),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: Text(
+                        task!.title,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 30,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              )
           ),
           Positioned(
-            top: 230,
+            top: 270,
             left: MediaQuery.of(context).size.width / 2 - 28,
             child: FloatingActionButton(
               onPressed: addTask,
@@ -169,7 +171,7 @@ class _SubTaskState extends ConsumerState<SubTask> {
       setState(() {
         _selectedDate = selectedDate;
         _deadlineController.text =
-        "${selectedDate.day}/${selectedDate.month}/${selectedDate.year}";
+            "${selectedDate.day}/${selectedDate.month}/${selectedDate.year}";
       });
     }
   }
@@ -214,7 +216,7 @@ class _SubTaskState extends ConsumerState<SubTask> {
                   decoration: InputDecoration(
                     hintText: "Enter task",
                     hintStyle:
-                    const TextStyle(fontSize: 14, color: Colors.black45),
+                        const TextStyle(fontSize: 14, color: Colors.black45),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -232,7 +234,7 @@ class _SubTaskState extends ConsumerState<SubTask> {
                   decoration: InputDecoration(
                     hintText: "Deadline",
                     hintStyle:
-                    const TextStyle(fontSize: 14, color: Colors.black45),
+                        const TextStyle(fontSize: 14, color: Colors.black45),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
