@@ -1,20 +1,51 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:listify/models/access_model.dart';
+import 'package:listify/providers/resource_provider.dart';
 
-class AccessScreen extends StatefulWidget {
+import '../models/task_model.dart';
+import '../models/user_model.dart';
+import '../providers/access_provider.dart';
+
+class AccessScreen extends ConsumerStatefulWidget {
   const AccessScreen({super.key});
 
   @override
-  State<AccessScreen> createState() => _AccessScreenState();
+  ConsumerState<AccessScreen> createState() => _AccessScreenState();
 }
 
-class _AccessScreenState extends State<AccessScreen> {
+class _AccessScreenState extends ConsumerState<AccessScreen> {
   final TextEditingController _accessController = TextEditingController();
 
   final List<String> accessTypes = ['View', 'Edit'];
-  String? _selectedAccess = 'View';
+  String? _selectedAccessAdd = 'View';
+  String? _selectedAccessUpdate;
+
+  @override
+  void initState() {
+    super.initState();
+    final user = ref.read(userProvider);
+    final task = ref.read(activeTaskProvider);
+    ref.read(accessProvider.notifier).fetchAccess(user!, task!);
+  }
 
   @override
   Widget build(BuildContext context) {
+    final accessState = ref.watch(accessProvider);
+    final owner = accessState['owner'] as Access;
+    final accessList = accessState['accessList'] as List<Access>;
+    final user = ref.read(userProvider);
+    final task = ref.read(activeTaskProvider);
+    final isOwner = user!.email == owner.email;
+
+    if (owner.email == 'No Owner Found') {
+      return Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
     return Scaffold(
         body: Container(
       color: Theme.of(context).primaryColorDark,
@@ -47,7 +78,9 @@ class _AccessScreenState extends State<AccessScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 GestureDetector(
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.of(context).pop();
+                  },
                   child: Container(
                       padding: const EdgeInsets.all(5),
                       height: 35,
@@ -66,17 +99,13 @@ class _AccessScreenState extends State<AccessScreen> {
                       )),
                 ),
                 Text(
-                  'Kalkulus',
+                  task!.title,
                   style: Theme.of(context).textTheme.displayLarge!.copyWith(
                       color: Theme.of(context).primaryColorLight,
                       fontWeight: FontWeight.bold),
                 ),
-                Text(
-                  '1 of 5 Tasks Done',
-                  style: Theme.of(context)
-                      .primaryTextTheme
-                      .bodyLarge!
-                      .copyWith(color: Theme.of(context).primaryColorLight),
+                const SizedBox(
+                  height: 5,
                 )
               ],
             ),
@@ -93,12 +122,19 @@ class _AccessScreenState extends State<AccessScreen> {
                 children: [
                   TextField(
                     controller: _accessController,
-                    style: Theme.of(context)
-                        .primaryTextTheme
-                        .bodyMedium!
-                        .copyWith(color: Theme.of(context).primaryColorLight),
+                    enabled: isOwner,
+                    // TextField hanya dapat diakses jika pengguna adalah owner
+                    style:
+                        Theme.of(context).primaryTextTheme.bodyMedium!.copyWith(
+                              color: isOwner
+                                  ? Theme.of(context).primaryColorLight
+                                  : Theme.of(context)
+                                      .primaryColorLight
+                                      .withOpacity(0.5),
+                            ),
                     decoration: InputDecoration(
-                      hintText: "Add People",
+                      hintText:
+                          isOwner ? "Add People" : "You don't have permission",
                       hintStyle: Theme.of(context)
                           .primaryTextTheme
                           .bodyMedium!
@@ -106,7 +142,7 @@ class _AccessScreenState extends State<AccessScreen> {
                             fontSize: 14,
                             color: Theme.of(context)
                                 .primaryColorLight
-                                .withOpacity(0.47),
+                                .withOpacity(isOwner ? 0.47 : 0.25),
                           ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -139,15 +175,17 @@ class _AccessScreenState extends State<AccessScreen> {
                         Icons.person_add_alt_1,
                         color: Theme.of(context)
                             .primaryColorLight
-                            .withOpacity(0.6),
+                            .withOpacity(isOwner ? 0.6 : 0.3),
                         size: 20,
                       ),
                     ),
-                    onChanged: (value) {
-                      if (value.isNotEmpty) {
-                        _buildPopUp();
-                      }
-                    },
+                    onChanged: isOwner
+                        ? (value) {
+                            if (value.isNotEmpty) {
+                              _addBuildPopUp(user, task);
+                            }
+                          }
+                        : null, // Tidak ada aksi jika bukan owner
                   ),
                   const SizedBox(
                     height: 20,
@@ -171,7 +209,7 @@ class _AccessScreenState extends State<AccessScreen> {
                   ListTile(
                     contentPadding:
                         const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
-                    title: Text("brianashari18@gmail.com",
+                    title: Text(owner.email,
                         style: Theme.of(context)
                             .primaryTextTheme
                             .bodyMedium!
@@ -202,13 +240,14 @@ class _AccessScreenState extends State<AccessScreen> {
                   Expanded(
                       child: ListView.separated(
                     shrinkWrap: true,
-                    itemCount: 3,
+                    itemCount: accessList.length,
                     padding: const EdgeInsets.symmetric(vertical: 0),
                     itemBuilder: (context, index) {
+                      Access userAccess = accessList[index];
                       return ListTile(
                         contentPadding: const EdgeInsets.symmetric(
                             horizontal: 0, vertical: 0),
-                        title: Text("brianashari18@gmail.com",
+                        title: Text(userAccess.email,
                             style: Theme.of(context)
                                 .primaryTextTheme
                                 .bodyMedium!
@@ -220,7 +259,7 @@ class _AccessScreenState extends State<AccessScreen> {
                           // Ensure the Row only takes necessary space
                           children: [
                             Text(
-                              'View',
+                              userAccess.access,
                               style: Theme.of(context)
                                   .primaryTextTheme
                                   .bodyMedium!
@@ -233,7 +272,19 @@ class _AccessScreenState extends State<AccessScreen> {
                                 Icons.more_vert,
                                 color: Theme.of(context).primaryColorLight,
                               ),
-                              onPressed: () {},
+                              onPressed: () {
+                                if (isOwner) {
+                                  _editBuildPopUp(
+                                      user, task, accessList, index);
+                                } else {
+                                  ScaffoldMessenger.of(context)
+                                      .clearSnackBars();
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                          content: Text(
+                                              'You don\'t have permission to set an access')));
+                                }
+                              },
                             ),
                           ],
                         ),
@@ -257,7 +308,7 @@ class _AccessScreenState extends State<AccessScreen> {
     ));
   }
 
-  void _buildPopUp() {
+  void _addBuildPopUp(User user, Task task) {
     showDialog(
       context: context,
       builder: (context) {
@@ -273,10 +324,10 @@ class _AccessScreenState extends State<AccessScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Share "Kalkulus"',
+                    'Share ${task.title}',
                     style: Theme.of(context)
                         .textTheme
-                        .bodyMedium!
+                        .bodyLarge!
                         .copyWith(color: Theme.of(context).primaryColorLight),
                   ),
                   const SizedBox(height: 20),
@@ -358,10 +409,11 @@ class _AccessScreenState extends State<AccessScreen> {
                             ),
                           ),
                           child: DropdownButton<String>(
-                            value: _selectedAccess,
+                            value: _selectedAccessAdd,
                             onChanged: (String? newValue) {
+                              print("Changing access type to: $newValue");
                               setState(() {
-                                _selectedAccess = newValue;
+                                _selectedAccessAdd = newValue;
                               });
                             },
                             items: accessTypes
@@ -418,8 +470,10 @@ class _AccessScreenState extends State<AccessScreen> {
                       ),
                       ElevatedButton(
                         onPressed: () {
-                          print("Email: ${_accessController.text}");
-                          print("Akses: $_selectedAccess");
+                          Access access = Access(
+                              email: _accessController.text,
+                              access: _selectedAccessAdd!);
+                          _addAccess(user, task, access);
                           _accessController.clear();
                           Navigator.of(context).pop();
                         },
@@ -442,4 +496,219 @@ class _AccessScreenState extends State<AccessScreen> {
       },
     );
   }
+
+  void _editBuildPopUp(
+      User user, Task task, List<Access> accessList, int index) {
+    _selectedAccessUpdate = accessList[index].access;
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Theme.of(context).primaryColorDark,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          content: StatefulBuilder(
+            builder: (context, setState) {
+              Access currentAccess = accessList[index];
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Share ${task.title}',
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyMedium!
+                        .copyWith(color: Theme.of(context).primaryColorLight),
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      Expanded(
+                          flex: 2,
+                          child: Container(
+                            padding: const EdgeInsets.all(15),
+                            decoration: BoxDecoration(
+                                color:
+                                    const Color(0xFF2D2C37).withOpacity(0.75),
+                                borderRadius: BorderRadius.circular(15)),
+                            child: Text(
+                              currentAccess.email,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium!
+                                  .copyWith(
+                                      color:
+                                          Theme.of(context).primaryColorLight),
+                            ),
+                          )),
+                      const SizedBox(width: 5),
+                      Expanded(
+                        flex: 1,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF2D2C37).withOpacity(0.75),
+                            borderRadius: BorderRadius.circular(15),
+                            border: Border.all(
+                              color: Theme.of(context)
+                                  .primaryColor
+                                  .withOpacity(0.3),
+                              width: 1.5,
+                            ),
+                          ),
+                          child: DropdownButton<String>(
+                            value: _selectedAccessUpdate,
+                            onChanged: (String? newValue) {
+                              print("Changing access type to: $newValue");
+                              setState(() {
+                                _selectedAccessUpdate = newValue!;
+                              });
+                            },
+                            items: accessTypes
+                                .map<DropdownMenuItem<String>>((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 12.0),
+                                  child: Text(
+                                    value,
+                                    style: Theme.of(context)
+                                        .primaryTextTheme
+                                        .bodyMedium!
+                                        .copyWith(
+                                          color: Theme.of(context)
+                                              .primaryColorLight,
+                                        ),
+                                  ),
+                                ),
+                              );
+                            }).toList()
+                              ..add(DropdownMenuItem<String>(
+                                value: 'Remove',
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 12.0),
+                                  child: Text(
+                                    'Remove',
+                                    style: Theme.of(context)
+                                        .primaryTextTheme
+                                        .bodyMedium!
+                                        .copyWith(
+                                          color: Theme.of(context)
+                                              .primaryColorLight,
+                                        ),
+                                  ),
+                                ),
+                              )),
+                            underline: const SizedBox(),
+                            isExpanded: true,
+                            dropdownColor:
+                                const Color(0xFF2D2C37).withOpacity(0.75),
+                            iconEnabledColor:
+                                Theme.of(context).primaryColorLight,
+                            iconDisabledColor: Theme.of(context)
+                                .primaryColorLight
+                                .withOpacity(0.5),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      const Spacer(),
+                      TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          style: TextButton.styleFrom(
+                            foregroundColor:
+                                Theme.of(context).primaryColorLight,
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 12, horizontal: 24),
+                          ),
+                          child: const Text('Cancel')),
+                      const SizedBox(
+                        width: 5,
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          if (_selectedAccessUpdate == 'Remove') {
+                            _deleteAccess(user, task, currentAccess, index);
+                          } else {
+                            Access access = Access(
+                                email: currentAccess.email,
+                                access: _selectedAccessUpdate!);
+                            _editAccess(user, task, access, index);
+                          }
+                          Navigator.of(context).pop();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 12, horizontal: 24),
+                          backgroundColor:
+                              const Color(0xFF2D2C37).withOpacity(0.75),
+                          foregroundColor: Theme.of(context).primaryColorLight,
+                        ),
+                        child: const Text("Send"),
+                      ),
+                    ],
+                  ),
+                ],
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  void _addAccess(User user, Task task, Access access) async {
+    try {
+      await ref.read(accessProvider.notifier).addAccess(user, task, access);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Access was added!')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString())),
+      );
+    }
+  }
+
+  void _editAccess(User user, Task task, Access access, int index) async {
+    try {
+      await ref
+          .read(accessProvider.notifier)
+          .editAccess(user, task, access, index);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Access was updated!')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString())),
+      );
+    }
+  }
+
+  void _deleteAccess(User user, Task task, Access access, int index) async {
+    try {
+      await ref
+          .read(accessProvider.notifier)
+          .deleteAccess(user, task, access, index);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Access was removed!')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString())),
+      );
+    }
+  }
 }
+
+

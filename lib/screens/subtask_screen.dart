@@ -1,26 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:table_calendar/table_calendar.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/resource_provider.dart';
+import '../widgets/calendar_bottom_sheet.dart';
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: SubTask(),
-    );
-  }
-}
-
-class SubTask extends StatefulWidget {
+class SubTask extends ConsumerStatefulWidget {
   const SubTask({super.key});
 
   @override
-  State<SubTask> createState() => _SubTaskState();
+  ConsumerState<SubTask> createState() => _SubTaskState();
 }
 
-class _SubTaskState extends State<SubTask> {
+class _SubTaskState extends ConsumerState<SubTask> {
   final TextEditingController _subtaskController = TextEditingController();
   final TextEditingController _deadlineController = TextEditingController();
   List<Map<String, dynamic>> tasks = [];
@@ -34,180 +24,10 @@ class _SubTaskState extends State<SubTask> {
     super.dispose();
   }
 
-  void _showCalendarModal(BuildContext context) async {
-    DateTime? selectedDate = await showModalBottomSheet<DateTime>(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      builder: (context) {
-        return CalendarBottomSheet();
-      },
-    );
-
-    if (selectedDate != null) {
-      setState(() {
-        _selectedDate = selectedDate;
-        _deadlineController.text =
-            "${selectedDate.day}/${selectedDate.month}/${selectedDate.year}";
-      });
-    }
-  }
-
-  void addTask() {
-    final TextEditingController taskController = TextEditingController();
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: const Color.fromRGBO(245, 245, 245, 1),
-      builder: (BuildContext context) {
-        return Padding(
-          padding: MediaQuery.of(context).viewInsets,
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      "ADD NEW TASK",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.close, color: Colors.black54),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                TextField(
-                  controller: taskController,
-                  decoration: InputDecoration(
-                    hintText: "Enter task",
-                    hintStyle:
-                        const TextStyle(fontSize: 14, color: Colors.black45),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                        vertical: 10, horizontal: 10),
-                    filled: true,
-                    fillColor: const Color.fromRGBO(191, 191, 191, 1),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                TextField(
-                  controller: _deadlineController,
-                  readOnly: true,
-                  onTap: () => _showCalendarModal(context),
-                  decoration: InputDecoration(
-                    hintText: "Deadline",
-                    hintStyle:
-                        const TextStyle(fontSize: 14, color: Colors.black45),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                        vertical: 10, horizontal: 10),
-                    filled: true,
-                    fillColor: const Color.fromRGBO(191, 191, 191, 1),
-                    suffixIcon: const Icon(Icons.calendar_today),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                DropdownButtonFormField<String>(
-                  value: _selectedStatus,
-                  hint: const Text("Status"),
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    filled: true,
-                    fillColor: const Color.fromRGBO(191, 191, 191, 1),
-                  ),
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      _selectedStatus = newValue;
-                    });
-                  },
-                  items: <String>['On Progress', 'Pending']
-                      .map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        if (taskController.text.isNotEmpty &&
-                            _deadlineController.text.isNotEmpty &&
-                            _selectedStatus != null) {
-                          setState(() {
-                            tasks.add({
-                              "task": taskController.text,
-                              "deadline": _deadlineController.text,
-                              "status": _selectedStatus,
-                              "done": false,
-                            });
-                            taskController.clear();
-                            _deadlineController.clear();
-                            _selectedStatus = null;
-                          });
-                        }
-                        Navigator.of(context).pop();
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color.fromRGBO(123, 119, 148, 1),
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 30),
-                      ),
-                      child: const Text("Done"),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  void toggleTaskDone(int index) {
-    setState(() {
-      // Toggle the "done" status
-      tasks[index]["done"] = !(tasks[index]["done"] ?? false);
-
-      // Menyusun ulang daftar tasks: tasks yang belum selesai di awal, dan tasks yang selesai di akhir
-      tasks.sort((a, b) {
-        if (a["done"] && !b["done"])
-          return 1; // Pindahkan tugas selesai setelah tugas belum selesai
-        if (!a["done"] && b["done"])
-          return -1; // Tetap tugas belum selesai sebelum tugas selesai
-        return 0; // Jaga urutan relatif jika keduanya sama
-      });
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
+    final user = ref.read(userProvider);
+    final task = ref.read(activeTaskProvider);
     return Scaffold(
       backgroundColor: const Color.fromRGBO(68, 64, 77, 1),
       body: Stack(
@@ -312,70 +132,176 @@ class _SubTaskState extends State<SubTask> {
       ),
     );
   }
-}
 
-class CalendarBottomSheet extends StatefulWidget {
-  const CalendarBottomSheet({super.key});
+  void _showCalendarModal(BuildContext context) async {
+    DateTime? selectedDate = await showModalBottomSheet<DateTime>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) {
+        return CalendarBottomSheet();
+      },
+    );
 
-  @override
-  State<CalendarBottomSheet> createState() => _CalendarBottomSheetState();
-}
+    if (selectedDate != null) {
+      setState(() {
+        _selectedDate = selectedDate;
+        _deadlineController.text =
+        "${selectedDate.day}/${selectedDate.month}/${selectedDate.year}";
+      });
+    }
+  }
 
-class _CalendarBottomSheetState extends State<CalendarBottomSheet> {
-  DateTime _focusedDay = DateTime.now();
-  DateTime? _selectedDay;
+  void addTask() {
+    final TextEditingController taskController = TextEditingController();
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        color: Color.fromRGBO(123, 119, 148, 1),
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.close, color: Colors.white),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-              const Expanded(
-                child: Center(
-                  child: Text(
-                    "Pick a Date",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: const Color.fromRGBO(245, 245, 245, 1),
+      builder: (BuildContext context) {
+        return Padding(
+          padding: MediaQuery.of(context).viewInsets,
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      "ADD NEW TASK",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
+                    IconButton(
+                      icon: const Icon(Icons.close, color: Colors.black54),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                TextField(
+                  controller: taskController,
+                  decoration: InputDecoration(
+                    hintText: "Enter task",
+                    hintStyle:
+                    const TextStyle(fontSize: 14, color: Colors.black45),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 10),
+                    filled: true,
+                    fillColor: const Color.fromRGBO(191, 191, 191, 1),
                   ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 20),
+                TextField(
+                  controller: _deadlineController,
+                  readOnly: true,
+                  onTap: () => _showCalendarModal(context),
+                  decoration: InputDecoration(
+                    hintText: "Deadline",
+                    hintStyle:
+                    const TextStyle(fontSize: 14, color: Colors.black45),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 10),
+                    filled: true,
+                    fillColor: const Color.fromRGBO(191, 191, 191, 1),
+                    suffixIcon: const Icon(Icons.calendar_today),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                DropdownButtonFormField<String>(
+                  value: _selectedStatus,
+                  hint: const Text("Status"),
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    filled: true,
+                    fillColor: const Color.fromRGBO(191, 191, 191, 1),
+                  ),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      _selectedStatus = newValue;
+                    });
+                  },
+                  items: <String>['On Progress', 'Pending']
+                      .map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        if (taskController.text.isNotEmpty &&
+                            _deadlineController.text.isNotEmpty &&
+                            _selectedStatus != null) {
+                          setState(() {
+                            tasks.add({
+                              "task": taskController.text,
+                              "deadline": _deadlineController.text,
+                              "status": _selectedStatus,
+                              "done": false,
+                            });
+                            taskController.clear();
+                            _deadlineController.clear();
+                            _selectedStatus = null;
+                          });
+                        }
+                        Navigator.of(context).pop();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color.fromRGBO(123, 119, 148, 1),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 30),
+                      ),
+                      child: const Text("Done"),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
-          TableCalendar(
-            firstDay: DateTime.utc(2020, 01, 01),
-            lastDay: DateTime.utc(2030, 12, 31),
-            focusedDay: _focusedDay,
-            selectedDayPredicate: (day) {
-              return isSameDay(_selectedDay, day);
-            },
-            onDaySelected: (selectedDay, focusedDay) {
-              setState(() {
-                _selectedDay = selectedDay;
-                _focusedDay = focusedDay;
-              });
-              Navigator.pop(context, _selectedDay);
-            },
-          ),
-        ],
-      ),
+        );
+      },
     );
+  }
+
+  void toggleTaskDone(int index) {
+    setState(() {
+      // Toggle the "done" status
+      tasks[index]["done"] = !(tasks[index]["done"] ?? false);
+
+      // Menyusun ulang daftar tasks: tasks yang belum selesai di awal, dan tasks yang selesai di akhir
+      tasks.sort((a, b) {
+        if (a["done"] && !b["done"])
+          return 1; // Pindahkan tugas selesai setelah tugas belum selesai
+        if (!a["done"] && b["done"])
+          return -1; // Tetap tugas belum selesai sebelum tugas selesai
+        return 0; // Jaga urutan relatif jika keduanya sama
+      });
+    });
   }
 }

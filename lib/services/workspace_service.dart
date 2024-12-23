@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:ui';
 
 import 'package:http/http.dart' as http;
+import 'package:listify/models/access_model.dart';
 
 import '../models/task_model.dart';
 import '../models/user_model.dart';
@@ -115,7 +116,8 @@ class WorkspaceService {
       // Debugging: print data yang dikirimkan
       print('Editing task ID: ${task.id}');
       print('New Title: $title');
-      print('New Color: ${color.value.toRadixString(16)}');  // Print the color as string representation
+      print(
+          'New Color: ${color.value.toRadixString(16)}'); // Print the color as string representation
 
       final response = await http.patch(
           Uri.parse('$_baseUrl/workspace/${user.id}/tasks/${task.id}'),
@@ -123,8 +125,11 @@ class WorkspaceService {
             'Content-Type': 'application/json',
             'Authorization': user.token
           },
-          body: json.encode({'name': title, 'color': color.value.toRadixString(16)}) // Send color as string
-      );
+          body: json.encode({
+            'name': title,
+            'color': color.value.toRadixString(16)
+          }) // Send color as string
+          );
 
       // Debugging: print status code dan response body
       print('Response Status Code: ${response.statusCode}');
@@ -185,6 +190,131 @@ class WorkspaceService {
         return {
           'success': 'true',
           'data': body['data'],
+        };
+      } else if (response.statusCode == 400) {
+        final body = json.decode(response.body);
+
+        // Debugging: print error dari response 400
+        print('Error response (400): ${body['errors']}');
+
+        return {'success': false, 'error': body['errors']};
+      } else {
+        final body = json.decode(response.body);
+
+        // Debugging: print error dari response lainnya
+        print('Unexpected error response: ${body['errors']}');
+
+        return {'success': false, 'error': body['errors']};
+      }
+    } catch (e) {
+      // Debugging: print error jika terjadi exception
+      print('Exception occurred: $e');
+      return {'success': false, 'error': 'Error: $e'};
+    }
+  }
+
+  Future<Map<String, dynamic>> getPeopleAccess(User user, Task task) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$_baseUrl/workspace/${user.id}/tasks/${task.id}'),
+        headers: {'Authorization': user.token},
+      );
+
+      // Debugging: print status code dan response body
+      print('Response Status Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final body = json.decode(response.body);
+
+        return {
+          'success': 'true',
+          'users': body['data'],
+        };
+      } else if (response.statusCode == 400) {
+        final body = json.decode(response.body);
+
+        // Debugging: print error dari response 400
+        print('Error response (400): ${body['errors']}');
+
+        return {'success': false, 'error': body['errors']};
+      } else {
+        final body = json.decode(response.body);
+
+        // Debugging: print error dari response lainnya
+        print('Unexpected error response: ${body['errors']}');
+
+        return {'success': false, 'error': body['errors']};
+      }
+    } catch (e) {
+      // Debugging: print error jika terjadi exception
+      print('Exception occurred: $e');
+      return {'success': false, 'error': 'Error: $e'};
+    }
+  }
+
+  Future<Map<String, dynamic>> addPeopleAccess(
+      User user, Task task, Access access) async {
+    try {
+      final response = await http.post(
+          Uri.parse('$_baseUrl/workspace/${task.id}'),
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': user.token
+          },
+          body: json.encode({
+            'email': access.email,
+            'accessRights': access.access == 'View' ? 1 : 2
+          }));
+
+      if (response.statusCode == 200) {
+        final body = json.decode(response.body);
+
+        return {
+          'success': 'true',
+          'access': body['data'],
+        };
+      } else if (response.statusCode == 400) {
+        final body = json.decode(response.body);
+
+        // Debugging: print error dari response 400
+        print('Error response (400): ${body['errors']}');
+
+        return {'success': false, 'error': body['errors']};
+      } else {
+        final body = json.decode(response.body);
+
+        // Debugging: print error dari response lainnya
+        print('Unexpected error response: ${body['errors']}');
+
+        return {'success': false, 'error': body['errors']};
+      }
+    } catch (e) {
+      // Debugging: print error jika terjadi exception
+      print('Exception occurred: $e');
+      return {'success': false, 'error': 'Error: $e'};
+    }
+  }
+
+  Future<Map<String, dynamic>> deletePeopleAccess(
+      User user, Task task, Access access) async {
+    try {
+      final response = await http.delete(
+          Uri.parse('$_baseUrl/workspace/${user.id}/tasks/${task.id}/remove'),
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': user.token
+          },
+          body: json.encode({
+            'email': access.email
+          }));
+
+      if (response.statusCode == 200) {
+        final body = json.decode(response.body);
+
+        return {
+          'success': 'true',
+          'message': body['data'],
         };
       } else if (response.statusCode == 400) {
         final body = json.decode(response.body);

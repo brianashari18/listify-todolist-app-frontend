@@ -1,24 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:listify/providers/resource_provider.dart';
+import 'package:listify/screens/access_screen.dart';
 import 'package:listify/screens/start_screen.dart';
 import 'package:listify/services/task_service.dart';
 import 'package:listify/services/user_service.dart';
 import 'package:listify/services/workspace_service.dart';
 import 'package:listify/widgets/side_drawer.dart';
 import 'package:listify/widgets/task_widget.dart';
+import '../models/access_model.dart';
 import '../models/task_model.dart';
 import '../models/user_model.dart';
+import '../providers/access_provider.dart';
 
-class HomepageScreen extends StatefulWidget {
+class HomepageScreen extends ConsumerStatefulWidget {
   const HomepageScreen({super.key, required this.user});
 
   final User user;
 
   @override
-  State<HomepageScreen> createState() => _HomepageScreenState();
+  ConsumerState<HomepageScreen> createState() => _HomepageScreenState();
 }
 
-class _HomepageScreenState extends State<HomepageScreen> {
+class _HomepageScreenState extends ConsumerState<HomepageScreen> {
   final TextEditingController _taskController = TextEditingController();
 
   List<Task> tasks = [];
@@ -39,6 +44,9 @@ class _HomepageScreenState extends State<HomepageScreen> {
   void initState() {
     super.initState();
     getTasks(_isPersonal);
+    Future.microtask(() {
+      ref.read(userProvider.notifier).state = widget.user;
+    });
   }
 
   @override
@@ -387,7 +395,9 @@ class _HomepageScreenState extends State<HomepageScreen> {
             .showSnackBar(SnackBar(content: Text(errorMessage)));
       }
     }
-    Navigator.of(context).pop();
+    if (Navigator.canPop(context)) {
+      Navigator.of(context).pop();
+    }
   }
 
   void _editTask(int index) {
@@ -597,7 +607,10 @@ class _HomepageScreenState extends State<HomepageScreen> {
     Navigator.of(context).pop();
   }
 
-  void accessTask(int index) {}
+  void accessTask(int index) {
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => AccessScreen()));
+  }
 
   void _colorOption() {
     showDialog(
@@ -636,7 +649,6 @@ class _HomepageScreenState extends State<HomepageScreen> {
   }
 
   void getTasks(bool isPersonal) async {
-    print("TEST $isPersonal");
     final result = isPersonal
         ? await _taskService.loadTasks(widget.user)
         : await _workspaceService.loadTasks(widget.user);
