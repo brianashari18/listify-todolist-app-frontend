@@ -279,91 +279,94 @@ class _HomepageScreenState extends ConsumerState<HomepageScreen> {
       backgroundColor: const Color.fromRGBO(245, 245, 245, 1),
       builder: (BuildContext context) {
         return Padding(
-          padding: const EdgeInsets.all(20), // Padding around bottom sheet
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text(
-                "Create New Task List",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 20),
-              TextField(
-                controller: _taskController,
-                decoration: InputDecoration(
-                  hintText: "Enter task description",
-                  hintStyle: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.black45,
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                  contentPadding:
-                      const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-                  filled: true,
-                  fillColor: const Color.fromRGBO(191, 191, 191, 1),
-                ),
-              ),
-              const SizedBox(height: 10),
-              // Display the selected color
-              Container(
-                margin: const EdgeInsets.symmetric(vertical: 10),
-                width: double.infinity,
-                height: 45,
-                decoration: BoxDecoration(
-                  color: _isSelected ? selectedColor : defaultColor,
-                  // Set the background color to the selected color
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: Colors.black.withOpacity(
-                        0.1), // Optional border for better visibility
+          padding: MediaQuery.of(context).viewInsets,
+          child: Padding(
+            padding: const EdgeInsets.all(20), // Padding around bottom sheet
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  "Create New Task List",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-                child: ElevatedButton(
-                  onPressed: _colorOption, // Open the color picker when clicked
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.transparent,
-                    // Make button background transparent
-                    shadowColor: Colors.transparent,
-                    // Remove shadow
-                    padding: EdgeInsets.zero, // Remove default padding
-                  ),
-                  child: const Text(
-                    "Select Task Color",
-                    style: TextStyle(
+                const SizedBox(height: 20),
+                TextField(
+                  controller: _taskController,
+                  decoration: InputDecoration(
+                    hintText: "Enter task description",
+                    hintStyle: const TextStyle(
                       fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.white,
+                      color: Colors.black45,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding:
+                        const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                    filled: true,
+                    fillColor: const Color.fromRGBO(191, 191, 191, 1),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                // Display the selected color
+                Container(
+                  margin: const EdgeInsets.symmetric(vertical: 10),
+                  width: double.infinity,
+                  height: 45,
+                  decoration: BoxDecoration(
+                    color: _isSelected ? selectedColor : defaultColor,
+                    // Set the background color to the selected color
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: Colors.black.withOpacity(
+                          0.1), // Optional border for better visibility
+                    ),
+                  ),
+                  child: ElevatedButton(
+                    onPressed: _colorOption, // Open the color picker when clicked
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      // Make button background transparent
+                      shadowColor: Colors.transparent,
+                      // Remove shadow
+                      padding: EdgeInsets.zero, // Remove default padding
+                    ),
+                    child: const Text(
+                      "Select Task Color",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  ElevatedButton(
-                    onPressed: _onAddSubmit,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromRGBO(123, 119, 148, 1),
-                      foregroundColor: const Color.fromRGBO(245, 245, 245, 1),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    ElevatedButton(
+                      onPressed: _onAddSubmit,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color.fromRGBO(123, 119, 148, 1),
+                        foregroundColor: const Color.fromRGBO(245, 245, 245, 1),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 12, horizontal: 30),
                       ),
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 12, horizontal: 30),
+                      child: const Text("Create"),
                     ),
-                    child: const Text("Create"),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
         );
       },
@@ -416,89 +419,92 @@ class _HomepageScreenState extends ConsumerState<HomepageScreen> {
       backgroundColor: const Color.fromRGBO(245, 245, 245, 1),
       builder: (BuildContext context) {
         return Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text(
-                "Edit Task List",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 20),
-              TextField(
-                controller: _taskController,
-                decoration: InputDecoration(
-                  hintText: "Enter task description",
-                  hintStyle: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.black45,
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                  contentPadding:
-                      const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-                  filled: true,
-                  fillColor: const Color.fromRGBO(191, 191, 191, 1),
-                ),
-              ),
-              const SizedBox(height: 10),
-              // Display the selected color
-              Container(
-                margin: const EdgeInsets.symmetric(vertical: 10),
-                width: double.infinity,
-                height: 45,
-                decoration: BoxDecoration(
-                  color: _isSelected ? selectedColor : defaultColor,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: Colors.black.withOpacity(0.1),
+          padding: MediaQuery.of(context).viewInsets,
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  "Edit Task List",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-                child: ElevatedButton(
-                  onPressed: _colorOption,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.transparent,
-                    shadowColor: Colors.transparent,
-                    padding: EdgeInsets.zero,
-                  ),
-                  child: const Text(
-                    "Select Task Color",
-                    style: TextStyle(
+                const SizedBox(height: 20),
+                TextField(
+                  controller: _taskController,
+                  decoration: InputDecoration(
+                    hintText: "Enter task description",
+                    hintStyle: const TextStyle(
                       fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.white,
+                      color: Colors.black45,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding:
+                        const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                    filled: true,
+                    fillColor: const Color.fromRGBO(191, 191, 191, 1),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                // Display the selected color
+                Container(
+                  margin: const EdgeInsets.symmetric(vertical: 10),
+                  width: double.infinity,
+                  height: 45,
+                  decoration: BoxDecoration(
+                    color: _isSelected ? selectedColor : defaultColor,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: Colors.black.withOpacity(0.1),
+                    ),
+                  ),
+                  child: ElevatedButton(
+                    onPressed: _colorOption,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      shadowColor: Colors.transparent,
+                      padding: EdgeInsets.zero,
+                    ),
+                    child: const Text(
+                      "Select Task Color",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      _onEditSubmit(tasks[_editingTaskIndex!]);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromRGBO(123, 119, 148, 1),
-                      foregroundColor: const Color.fromRGBO(245, 245, 245, 1),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        _onEditSubmit(tasks[_editingTaskIndex!]);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color.fromRGBO(123, 119, 148, 1),
+                        foregroundColor: const Color.fromRGBO(245, 245, 245, 1),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 12, horizontal: 30),
                       ),
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 12, horizontal: 30),
+                      child: const Text("Save"),
                     ),
-                    child: const Text("Save"),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
         );
       },
