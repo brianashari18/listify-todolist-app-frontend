@@ -3,6 +3,7 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:listify/providers/resource_provider.dart';
 import 'package:listify/screens/access_screen.dart';
+import 'package:listify/screens/profile.dart';
 import 'package:listify/screens/start_screen.dart';
 import 'package:listify/services/task_service.dart';
 import 'package:listify/services/user_service.dart';
@@ -39,6 +40,7 @@ class _HomepageScreenState extends ConsumerState<HomepageScreen> {
   int? _deletingTaskIndex;
   int? _accessTaskIndex;
   bool _isPersonal = true;
+  bool _isFetching = true;
 
   @override
   void initState() {
@@ -128,11 +130,10 @@ class _HomepageScreenState extends ConsumerState<HomepageScreen> {
                   color: Color.fromRGBO(68, 64, 77, 1),
                 ),
                 onPressed: () {
-                  _userService.removeUser();
-                  Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(
-                          builder: (context) => const StartScreen()),
-                      (route) => false);
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => Profile(
+                            user: widget.user,
+                          )));
                 },
               ),
             ),
@@ -231,37 +232,43 @@ class _HomepageScreenState extends ConsumerState<HomepageScreen> {
                   ),
                   const SizedBox(height: 5.0),
                   Expanded(
-                    child: tasks.isEmpty
+                    child: _isFetching == true
                         ? const Center(
-                            child: Text(
-                              'List is Empty!',
-                              style: TextStyle(color: Color(0xFFF5F5F5)),
-                            ),
+                            child: CircularProgressIndicator(),
                           )
-                        : GridView.builder(
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 30.0,
-                              mainAxisSpacing: 30.0,
-                            ),
-                            itemCount: tasks.length,
-                            itemBuilder: (context, index) {
-                              return TaskWidget(
-                                task: tasks[index],
-                                index: index,
-                                onEdit: (index) {
-                                  _editTask(index); // When Edit is selected
+                        : tasks.isEmpty
+                            ? const Center(
+                                child: Text(
+                                  'List is Empty!',
+                                  style: TextStyle(color: Color(0xFFF5F5F5)),
+                                ),
+                              )
+                            : GridView.builder(
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2,
+                                  crossAxisSpacing: 30.0,
+                                  mainAxisSpacing: 30.0,
+                                ),
+                                itemCount: tasks.length,
+                                itemBuilder: (context, index) {
+                                  return TaskWidget(
+                                    task: tasks[index],
+                                    index: index,
+                                    onEdit: (index) {
+                                      _editTask(index); // When Edit is selected
+                                    },
+                                    onDelete: (index) {
+                                      _deleteTask(
+                                          index); // When Delete is selected
+                                    },
+                                    onAccess: (index) {
+                                      accessTask(
+                                          index); // When Access is selected
+                                    },
+                                  );
                                 },
-                                onDelete: (index) {
-                                  _deleteTask(index); // When Delete is selected
-                                },
-                                onAccess: (index) {
-                                  accessTask(index); // When Access is selected
-                                },
-                              );
-                            },
-                          ),
+                              ),
                   ),
                 ],
               ),
@@ -306,8 +313,8 @@ class _HomepageScreenState extends ConsumerState<HomepageScreen> {
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide.none,
                     ),
-                    contentPadding:
-                        const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                    contentPadding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 15),
                     filled: true,
                     fillColor: const Color.fromRGBO(191, 191, 191, 1),
                   ),
@@ -328,7 +335,8 @@ class _HomepageScreenState extends ConsumerState<HomepageScreen> {
                     ),
                   ),
                   child: ElevatedButton(
-                    onPressed: _colorOption, // Open the color picker when clicked
+                    onPressed: _colorOption,
+                    // Open the color picker when clicked
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.transparent,
                       // Make button background transparent
@@ -446,8 +454,8 @@ class _HomepageScreenState extends ConsumerState<HomepageScreen> {
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide.none,
                     ),
-                    contentPadding:
-                        const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                    contentPadding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 15),
                     filled: true,
                     fillColor: const Color.fromRGBO(191, 191, 191, 1),
                   ),
@@ -614,8 +622,8 @@ class _HomepageScreenState extends ConsumerState<HomepageScreen> {
   }
 
   void accessTask(int index) {
-    Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) => AccessScreen()));
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => AccessScreen()));
   }
 
   void _colorOption() {
@@ -655,6 +663,10 @@ class _HomepageScreenState extends ConsumerState<HomepageScreen> {
   }
 
   void getTasks(bool isPersonal) async {
+    setState(() {
+      _isFetching = true;
+    });
+
     final result = isPersonal
         ? await _taskService.loadTasks(widget.user)
         : await _workspaceService.loadTasks(widget.user);
@@ -671,5 +683,9 @@ class _HomepageScreenState extends ConsumerState<HomepageScreen> {
       final errorMessage = result['error'];
       print(errorMessage);
     }
+
+    setState(() {
+      _isFetching = false;
+    });
   }
 }

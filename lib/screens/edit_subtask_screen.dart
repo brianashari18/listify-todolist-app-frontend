@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:listify/models/recomendation_model.dart';
 import 'package:listify/models/subtask_model.dart';
 import 'package:listify/providers/resource_provider.dart';
+import 'package:listify/services/ai_service.dart';
 import 'package:listify/services/subtask_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -23,6 +25,8 @@ class _EditSubTaskScreenState extends ConsumerState<EditSubTaskScreen> {
   final TextEditingController _subTaskController = TextEditingController();
   final TextEditingController _deadlineController = TextEditingController();
   final SubTaskService _subTaskService = SubTaskService();
+  final AIService _aiService = AIService();
+  List<Recommendation> _recommendations = [];
   String? _selectedStatus;
   DateTime? _selectedDate;
   User? user;
@@ -33,6 +37,8 @@ class _EditSubTaskScreenState extends ConsumerState<EditSubTaskScreen> {
     super.initState();
     user = ref.read(userProvider);
     task = ref.read(activeTaskProvider);
+
+    _getRecommendation();
 
     _subTaskController.addListener(_onAutoSave);
     _deadlineController.addListener(_onAutoSave);
@@ -77,12 +83,7 @@ class _EditSubTaskScreenState extends ConsumerState<EditSubTaskScreen> {
           _selectedStatus!,
         );
 
-        if (!result['success']) {
-          final errorMessage = result['error'];
-          ScaffoldMessenger.of(context).clearSnackBars();
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text(errorMessage)));
-        }
+        _getRecommendation();
       } catch (e) {
         print("Error updating subtask: $e");
       }
@@ -189,7 +190,6 @@ class _EditSubTaskScreenState extends ConsumerState<EditSubTaskScreen> {
               ),
             ),
 
-            // Draggable Scrollable Sheet
             DraggableScrollableSheet(
               initialChildSize: 0.4,
               minChildSize: 0.1,
@@ -394,36 +394,88 @@ class _EditSubTaskScreenState extends ConsumerState<EditSubTaskScreen> {
               ),
             ),
           ),
-          ListView.builder(
-            padding: const EdgeInsets.only(top: 20),
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: 3,
-            itemBuilder: (context, index) {
-              return ListTile(
-                title: Align(
-                  alignment: Alignment.centerLeft,
-                  child: TextButton(
-                    onPressed: () async {
-                      final uri = Uri.parse("https://youtube.com");
-                      if (!await launchUrl(uri)) {
-                        print("Could not launch URL");
-                      }
-                    },
-                    child: Text(
-                      "https://example.com",
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyLarge!
-                          .copyWith(color: Theme.of(context).primaryColorLight),
-                    ),
-                  ),
+          _recommendations.isEmpty
+              ? Padding(
+                  padding: const EdgeInsets.only(top: 20),
+                  child: Center(child: const CircularProgressIndicator()),
+                )
+              : ListView.builder(
+                  padding: const EdgeInsets.only(top: 20),
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: _recommendations.length,
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      title: Align(
+                        alignment: Alignment.centerLeft,
+                        child: TextButton(
+                          onPressed: () async {
+                            final uri = Uri.parse(_recommendations[index].link);
+                            if (!await launchUrl(uri)) {
+                              print("Could not launch URL");
+                            }
+                          },
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                truncateText(_recommendations[index].snippet),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyLarge!
+                                    .copyWith(
+                                    color: Theme.of(context).primaryColorLight,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              Text(
+                                _recommendations[index].link,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyLarge!
+                                    .copyWith(
+                                        color: Theme.of(context)
+                                            .primaryColorLight),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
                 ),
-              );
-            },
-          ),
         ],
       ),
     );
+  }
+
+  String truncateText(String text, {int wordLimit = 7}) {
+    List<String> words = text.split(' ');
+
+    if (words.length > wordLimit) {
+      words = words.sublist(0, wordLimit);
+      return '${words.join(' ')}...';
+    } else {
+      return text;
+    }
+  }
+
+
+  void _getRecommendation() async {
+    final result = await _aiService.getRecommendation(widget.subTask);
+    if (result['success']) {
+      final data = result['data'] as List;
+      setState(() {
+        _recommendations = data
+            .map((recommendation) => Recommendation.fromJson(recommendation))
+            .toList();
+      });
+    } else if (result['error'] == 'Recommendation not found') {
+      setState(() {
+        _recommendations = [];
+      });
+    } else {
+      final errorMessage = result['error'];
+      print(errorMessage);
+    }
   }
 }

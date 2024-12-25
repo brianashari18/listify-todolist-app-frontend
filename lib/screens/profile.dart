@@ -1,239 +1,171 @@
 import 'package:flutter/material.dart';
+import 'package:listify/screens/forget_password_screen.dart';
+import 'package:listify/screens/start_screen.dart';
+import 'package:listify/services/user_service.dart';
 
-class Profile extends StatelessWidget {
-  const Profile({super.key});
+import '../models/user_model.dart';
+
+class Profile extends StatefulWidget {
+  const Profile({super.key, required this.user});
+
+  final User user;
+
+  @override
+  State<Profile> createState() => _ProfileState();
+}
+
+class _ProfileState extends State<Profile> {
+  final TextEditingController _usernameController = TextEditingController();
+  final UserService _userService = UserService();
+
+  @override
+  void initState() {
+    _usernameController.text = widget.user.username;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          Container(
-            width: 438,
-            height: 971,
-            decoration: const BoxDecoration(
-              boxShadow: [
-                BoxShadow(
-                  color: Color(0x3F000000),
-                  blurRadius: 150,
-                  offset: Offset(80, 80),
-                  spreadRadius: 0,
-                ),
-                BoxShadow(
-                  color: Color(0x59000000),
-                  blurRadius: 50,
-                  offset: Offset(20, 20),
-                  spreadRadius: 0,
-                ),
-              ],
-            ),
-            child: Stack(
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF44404D),
+        // Using primary dark color from theme
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        title: const Text(
+          "Profile",
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 30,
+          ),
+        ),
+        centerTitle: true,
+      ),
+      body: Container(
+        width: double.infinity,
+        height: MediaQuery.of(context).size.height,
+        padding: const EdgeInsets.symmetric(horizontal: 50.0, vertical: 16.0),
+        decoration: const BoxDecoration(
+          color: Color(0xFF44404D), // Using primary dark color from theme
+        ),
+        child: Center(
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Positioned(
-                  left: 0,
-                  top: 0,
-                  child: SizedBox(
-                    width: 442.53,
-                    height: 971,
-                  ),
+                _buildInputField(
+                  controller: _usernameController,
+                  hintText: widget.user.username,
+                  onChanged: (value) {
+                    print('Auto-saving username: $value');
+                  },
                 ),
-                Positioned(
-                  left: 10.19,
-                  top: 16.98,
-                  child: SizedBox(
-                    width: 418.76,
-                    height: 930.26,
-                    child: Stack(
-                      children: [
-                        Positioned(
-                          left: -10.19,
-                          top: -16.98,
-                          child: Container(
-                            width: 443,
-                            height: 971,
-                            decoration:
-                                const BoxDecoration(color: Color(0xFF44404D)),
-                          ),
-                        ),
-                      ],
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    _buildButton(
+                      context,
+                      label: 'Change Password',
+                      onPressed: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) =>
+                                const ForgetPasswordScreen()));
+                      },
                     ),
-                  ),
-                ),
-                Positioned(
-                  left: 10.19,
-                  top: 16.98,
-                  child: SizedBox(
-                    width: 418.76,
-                    height: 930.26,
-                    child: Stack(
-                      children: [
-                        Positioned(
-                          left: -10.19,
-                          top: -16.98,
-                          child: Container(
-                            width: 443,
-                            height: 971,
-                            decoration:
-                                const BoxDecoration(color: Color(0xFF44404D)),
-                          ),
-                        ),
-                        Positioned(
-                          left: 130.81,
-                          top: 85.02,
-                          child: ClipOval(
-                            child: Container(
-                              width: 150,
-                              height: 150,
-                              decoration: BoxDecoration(
-                                color: Colors.grey[300], // Placeholder color
-                                image: const DecorationImage(
-                                  image: AssetImage(
-                                      'assets/default_profile.png'), // Default image placeholder
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                              child: const Center(
-                                child: Icon(
-                                  Icons
-                                      .camera_alt, // Placeholder icon to indicate the photo can be uploaded
-                                  color: Colors.white,
-                                  size: 50,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          left: 50.81,
-                          top: 309.02,
-                          child: GestureDetector(
-                            onTap: () {
-                              // Handle the username click here
-                              print('Username clicked');
-                            },
-                            child: Container(
-                              width: 312,
-                              height: 56,
-                              clipBehavior: Clip.antiAlias,
-                              decoration: ShapeDecoration(
-                                color: const Color(0xFFF5F5F5),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                                shadows: const [
-                                  BoxShadow(
-                                    color: Color(0x4C000000),
-                                    blurRadius: 3,
-                                    offset: Offset(0, 1),
-                                    spreadRadius: 0,
-                                  ),
-                                  BoxShadow(
-                                    color: Color(0x26000000),
-                                    blurRadius: 8,
-                                    offset: Offset(0, 4),
-                                    spreadRadius: 3,
-                                  ),
-                                ],
-                              ),
-                              child: const Row(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 16),
-                                    child: Text(
-                                      'Username',
-                                      style: TextStyle(
-                                        color: Color(0xFF1E1E2A),
-                                        fontSize: 14,
-                                        fontFamily: 'Roboto',
-                                        fontWeight: FontWeight.w500,
-                                        height: 0.10,
-                                        letterSpacing: 0.10,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          left: 53.81,
-                          top: 390.02,
-                          child: GestureDetector(
-                            onTap: () {
-                              // Handle the Change Password click here
-                              print('Change Password clicked');
-                            },
-                            child: Container(
-                              width: 312,
-                              height: 56,
-                              clipBehavior: Clip.antiAlias,
-                              decoration: ShapeDecoration(
-                                color: const Color(0xFFF5F5F5),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                                shadows: const [
-                                  BoxShadow(
-                                    color: Color(0x4C000000),
-                                    blurRadius: 3,
-                                    offset: Offset(0, 1),
-                                    spreadRadius: 0,
-                                  ),
-                                  BoxShadow(
-                                    color: Color(0x26000000),
-                                    blurRadius: 8,
-                                    offset: Offset(0, 4),
-                                    spreadRadius: 3,
-                                  ),
-                                ],
-                              ),
-                              child: const Row(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 16),
-                                    child: Text(
-                                      'Change Password',
-                                      style: TextStyle(
-                                        color: Color(0xFF1E1E2A),
-                                        fontSize: 14,
-                                        fontFamily: 'Roboto',
-                                        fontWeight: FontWeight.w500,
-                                        height: 0.10,
-                                        letterSpacing: 0.10,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
+                    Spacer(),
+                    _buildButton(
+                      context,
+                      label: 'Logout',
+                      onPressed: () {
+                        _userService.removeUser();
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => const StartScreen()));
+                      },
                     ),
-                  ),
-                ),
-                Positioned(
-                  left: 205.98,
-                  top: 23.77,
-                  child: SizedBox(
-                    width: 22.64,
-                    height: 22.63,
-                  ),
+                  ],
                 ),
               ],
             ),
           ),
-        ],
+        ),
       ),
+    );
+  }
+
+  Widget _buildInputField({
+    required TextEditingController controller,
+    required String hintText,
+    ValueChanged<String>? onChanged,
+  }) {
+    return GestureDetector(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        decoration: BoxDecoration(
+          color: const Color(0xFF7B7794), // Input background color
+          borderRadius: BorderRadius.circular(15),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x3F000000),
+              blurRadius: 4,
+              offset: Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: TextField(
+                controller: controller,
+                style: const TextStyle(
+                  color: Color(0xFFF5F5F5),
+                  // Light text color
+                  fontSize: 16,
+                  fontFamily: 'Open Sans',
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.5,
+                ),
+                onChanged: onChanged,
+                decoration: InputDecoration(
+                  hintText: hintText,
+                  hintStyle: const TextStyle(
+                    color: Color(0xFFF5F5F5),
+                    // Light hint color
+                    fontSize: 16,
+                    fontFamily: 'Open Sans',
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.5,
+                  ),
+                  border: InputBorder.none, // Remove default border
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildButton(BuildContext context,
+      {required String label, required VoidCallback onPressed}) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ButtonStyle(
+        backgroundColor:
+            WidgetStateProperty.all<Color>(const Color(0xFF7B7794)),
+        foregroundColor:
+            WidgetStateProperty.all<Color>(const Color(0xFFF5F5F5)),
+        shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.0),
+          ),
+        ),
+      ),
+      child: Text(label),
     );
   }
 }
