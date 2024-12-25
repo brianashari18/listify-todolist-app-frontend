@@ -484,7 +484,7 @@ class _AccessScreenState extends ConsumerState<AccessScreen> {
                               const Color(0xFF2D2C37).withOpacity(0.75),
                           foregroundColor: Theme.of(context).primaryColorLight,
                         ),
-                        child: const Text("Send"),
+                        child: const Text("Add"),
                       ),
                     ],
                   ),

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:listify/providers/auth_provider.dart';
 import 'package:listify/screens/subtask_screen.dart';
 
 import '../models/access_model.dart';
@@ -46,7 +45,6 @@ class _TaskWidgetState extends ConsumerState<TaskWidget> {
         debugPrint('User or Task is null in TaskWidget.');
       }
     });
-
   }
 
   @override
@@ -65,10 +63,12 @@ class _TaskWidgetState extends ConsumerState<TaskWidget> {
         // Fetch access data
         final user = ref.read(userProvider);
         if (user != null) {
-          await ref.read(accessProvider.notifier).fetchAccess(user, widget.task);
+          await ref
+              .read(accessProvider.notifier)
+              .fetchAccess(user, widget.task);
         }
         Navigator.of(context)
-            .push(MaterialPageRoute(builder: (context) => SubTask()));
+            .push(MaterialPageRoute(builder: (context) => SubTaskScreen()));
       },
       child: Container(
         width: 120, // Lebar container
@@ -113,19 +113,29 @@ class _TaskWidgetState extends ConsumerState<TaskWidget> {
                   // Fetch access data
                   final user = ref.read(userProvider);
                   if (user != null) {
-                    await ref.read(accessProvider.notifier).fetchAccess(user, widget.task);
+                    await ref
+                        .read(accessProvider.notifier)
+                        .fetchAccess(user, widget.task);
                   }
 
-                  // Read updated state
                   final accessState = ref.read(accessProvider);
                   final accessList = accessState['accessList'] as List<Access>?;
                   final owner = accessState['owner'] as Access?;
-                  if (accessList == null || owner == null || user == null) {
-                    _showNoPermissionMessage(context);
+                  if (accessList == null ||
+                      owner == null ||
+                      user == null ||
+                      !context.mounted) {
+                    if (context.mounted) {
+                      ref
+                          .read(accessProvider.notifier)
+                          .showNoPermissionMessage(context);
+                    }
                     return;
                   }
 
-                  final access = getPermission(user, accessList);
+                  final access = ref
+                      .read(accessProvider.notifier)
+                      .getPermission(user, accessList);
                   final isOwner = user.email == owner.email;
                   final hasPermission = access.access == 'Edit' || isOwner;
 
@@ -138,14 +148,22 @@ class _TaskWidgetState extends ConsumerState<TaskWidget> {
                       if (hasPermission) {
                         widget.onEdit(widget.index);
                       } else {
-                        _showNoPermissionMessage(context);
+                        if (context.mounted) {
+                          ref
+                              .read(accessProvider.notifier)
+                              .showNoPermissionMessage(context);
+                        }
                       }
                       break;
                     case Options.Delete:
                       if (hasPermission) {
                         widget.onDelete(widget.index);
                       } else {
-                        _showNoPermissionMessage(context);
+                        if (context.mounted) {
+                          ref
+                              .read(accessProvider.notifier)
+                              .showNoPermissionMessage(context);
+                        }
                       }
                       break;
                     case Options.Access:
@@ -205,20 +223,6 @@ class _TaskWidgetState extends ConsumerState<TaskWidget> {
           ],
         ),
       ),
-    );
-  }
-
-  void _showNoPermissionMessage(BuildContext context) {
-    ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('You don\'t have permission!')),
-    );
-  }
-
-  Access getPermission(User user, List<Access> accessList) {
-    return accessList.firstWhere(
-      (access) => access.email == user.email,
-      orElse: () => Access(email: user.email, access: 'None'), // Nilai default
     );
   }
 }

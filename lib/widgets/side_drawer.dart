@@ -4,6 +4,7 @@ import 'package:listify/screens/about_screen.dart';
 import 'package:listify/screens/helpCenter_screen.dart';
 import 'package:listify/screens/homepage_screen.dart';
 import 'package:listify/screens/setting_screen.dart';
+import 'package:listify/screens/trash_screen.dart';
 
 import '../providers/auth_provider.dart';
 
@@ -49,7 +50,10 @@ class SideDrawer extends ConsumerWidget {
             ListTile(
               leading: const Icon(Icons.delete_outline),
               title: const Text('Trash'),
-              onTap: () {},
+              onTap: () {
+                Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => TrashScreen()));
+              },
             ),
             ListTile(
               leading: const Icon(Icons.help_outline),

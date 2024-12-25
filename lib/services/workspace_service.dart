@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:http/http.dart' as http;
 import 'package:listify/models/access_model.dart';
+import 'package:listify/models/subtask_model.dart';
 
 import '../models/task_model.dart';
 import '../models/user_model.dart';
@@ -217,6 +218,46 @@ class WorkspaceService {
     try {
       final response = await http.get(
         Uri.parse('$_baseUrl/workspace/${user.id}/tasks/${task.id}'),
+        headers: {'Authorization': user.token},
+      );
+
+      // Debugging: print status code dan response body
+      print('Response Status Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final body = json.decode(response.body);
+
+        return {
+          'success': 'true',
+          'users': body['data'],
+        };
+      } else if (response.statusCode == 400) {
+        final body = json.decode(response.body);
+
+        // Debugging: print error dari response 400
+        print('Error response (400): ${body['errors']}');
+
+        return {'success': false, 'error': body['errors']};
+      } else {
+        final body = json.decode(response.body);
+
+        // Debugging: print error dari response lainnya
+        print('Unexpected error response: ${body['errors']}');
+
+        return {'success': false, 'error': body['errors']};
+      }
+    } catch (e) {
+      // Debugging: print error jika terjadi exception
+      print('Exception occurred: $e');
+      return {'success': false, 'error': 'Error: $e'};
+    }
+  }
+
+  Future<Map<String, dynamic>> getPeopleAccessByTrash(User user, SubTask subtask) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$_baseUrl/workspace/${subtask.id}/access'),
         headers: {'Authorization': user.token},
       );
 
