@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:listify/screens/edit_subtask_screen.dart';
 import 'package:listify/services/subtask_service.dart';
 import '../models/access_model.dart';
 import '../models/subtask_model.dart';
@@ -178,7 +179,7 @@ class _SubTaskScreenState extends ConsumerState<SubTaskScreen> {
                     child: FloatingActionButton(
                       onPressed: () {
                         if (hasPermission) {
-                          addSubTask(user, task);
+                          _addSubTask(user, task);
                         } else {
                           ref
                               .read(accessProvider.notifier)
@@ -232,48 +233,66 @@ class _SubTaskScreenState extends ConsumerState<SubTaskScreen> {
                       ),
                     ),
                     title: InkWell(
-                      onTap: () {
-                      },
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            _uncompletedSubtasks[index].taskData,
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleLarge!
-                                .copyWith(
-                                  color:
-                                      _uncompletedSubtasks[index].status == 'Done'
-                                          ? Theme.of(context)
-                                              .primaryColorLight
-                                              .withOpacity(0.5)
-                                          : Theme.of(context).primaryColorLight,
-                                  decoration:
-                                      _uncompletedSubtasks[index].status == 'Done'
-                                          ? TextDecoration.lineThrough
-                                          : TextDecoration.none,
-                                ),
+                      onTap: () async {
+                        bool? result = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                EditSubTaskScreen(subTask: _subtasks[index]),
                           ),
-                          Text(
-                            '${_uncompletedSubtasks[index].deadline} | ${_uncompletedSubtasks[index].status}',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium!
-                                .copyWith(
-                                  color:
-                                      _uncompletedSubtasks[index].status == 'Done'
-                                          ? Theme.of(context)
-                                              .primaryColorLight
-                                              .withOpacity(0.5)
-                                          : Theme.of(context).primaryColorLight,
-                                  decoration:
-                                      _uncompletedSubtasks[index].status == 'Done'
-                                          ? TextDecoration.lineThrough
-                                          : TextDecoration.none,
-                                ),
-                          )
-                        ],
+                        );
+
+                        if (result == true) {
+                          setState(() {
+                            _getSubtasks(user, task);
+                          });
+                        }
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              _uncompletedSubtasks[index].taskData,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleLarge!
+                                  .copyWith(
+                                    color: _uncompletedSubtasks[index].status ==
+                                            'Done'
+                                        ? Theme.of(context)
+                                            .primaryColorLight
+                                            .withOpacity(0.5)
+                                        : Theme.of(context).primaryColorLight,
+                                    decoration:
+                                        _uncompletedSubtasks[index].status ==
+                                                'Done'
+                                            ? TextDecoration.lineThrough
+                                            : TextDecoration.none,
+                                  ),
+                            ),
+                            Text(
+                              '${_uncompletedSubtasks[index].deadline} | ${_uncompletedSubtasks[index].status}',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium!
+                                  .copyWith(
+                                    color: _uncompletedSubtasks[index].status ==
+                                            'Done'
+                                        ? Theme.of(context)
+                                            .primaryColorLight
+                                            .withOpacity(0.5)
+                                        : Theme.of(context).primaryColorLight,
+                                    decoration:
+                                        _uncompletedSubtasks[index].status ==
+                                                'Done'
+                                            ? TextDecoration.lineThrough
+                                            : TextDecoration.none,
+                                  ),
+                            )
+                          ],
+                        ),
                       ),
                     ),
                     trailing: IconButton(
@@ -354,46 +373,66 @@ class _SubTaskScreenState extends ConsumerState<SubTaskScreen> {
                         ),
                       ),
                     ),
-                    title: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          _completedSubtasks[index].taskData,
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleLarge!
-                              .copyWith(
-                                color:
-                                    _completedSubtasks[index].status == 'Done'
-                                        ? Theme.of(context)
-                                            .primaryColorLight
-                                            .withOpacity(0.5)
-                                        : Theme.of(context).primaryColorLight,
-                                decoration:
-                                    _completedSubtasks[index].status == 'Done'
-                                        ? TextDecoration.lineThrough
-                                        : TextDecoration.none,
-                              ),
+                    title: InkWell(
+                      onTap: () async {
+                        bool? result = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                EditSubTaskScreen(subTask: _subtasks[index]),
+                          ),
+                        );
+
+                        if (result == true) {
+                          setState(() {
+                            _getSubtasks(user, task);
+                          });
+                        }
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              _completedSubtasks[index].taskData,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleLarge!
+                                  .copyWith(
+                                    color:
+                                        _completedSubtasks[index].status == 'Done'
+                                            ? Theme.of(context)
+                                                .primaryColorLight
+                                                .withOpacity(0.5)
+                                            : Theme.of(context).primaryColorLight,
+                                    decoration:
+                                        _completedSubtasks[index].status == 'Done'
+                                            ? TextDecoration.lineThrough
+                                            : TextDecoration.none,
+                                  ),
+                            ),
+                            Text(
+                              '${_completedSubtasks[index].deadline} | ${_completedSubtasks[index].status}',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium!
+                                  .copyWith(
+                                    color:
+                                        _completedSubtasks[index].status == 'Done'
+                                            ? Theme.of(context)
+                                                .primaryColorLight
+                                                .withOpacity(0.5)
+                                            : Theme.of(context).primaryColorLight,
+                                    decoration:
+                                        _completedSubtasks[index].status == 'Done'
+                                            ? TextDecoration.lineThrough
+                                            : TextDecoration.none,
+                                  ),
+                            )
+                          ],
                         ),
-                        Text(
-                          '${_completedSubtasks[index].deadline} | ${_completedSubtasks[index].status}',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium!
-                              .copyWith(
-                                color:
-                                    _completedSubtasks[index].status == 'Done'
-                                        ? Theme.of(context)
-                                            .primaryColorLight
-                                            .withOpacity(0.5)
-                                        : Theme.of(context).primaryColorLight,
-                                decoration:
-                                    _completedSubtasks[index].status == 'Done'
-                                        ? TextDecoration.lineThrough
-                                        : TextDecoration.none,
-                              ),
-                        )
-                      ],
+                      ),
                     ),
                     trailing: IconButton(
                       icon: const Icon(Icons.delete, color: Colors.grey),
@@ -448,7 +487,7 @@ class _SubTaskScreenState extends ConsumerState<SubTaskScreen> {
     }
   }
 
-  void addSubTask(User user, Task task) {
+  void _addSubTask(User user, Task task) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -662,12 +701,11 @@ class _SubTaskScreenState extends ConsumerState<SubTaskScreen> {
 
   void toggleTaskDone(int index, User user, Task task, SubTask subtask) {
     final updatedTask = SubTask(
-      id: subtask.id,
-      taskData: subtask.taskData,
-      deadline: subtask.deadline,
-      status: subtask.status == 'Done' ? 'On Progress' : 'Done',
-      taskId: task.id
-    );
+        id: subtask.id,
+        taskData: subtask.taskData,
+        deadline: subtask.deadline,
+        status: subtask.status == 'Done' ? 'On Progress' : 'Done',
+        taskId: task.id);
 
     _updateSubtask(index, user, task, updatedTask);
   }

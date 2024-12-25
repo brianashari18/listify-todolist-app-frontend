@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:listify/screens/FAQ_screen.dart';
 import 'package:listify/screens/Feedback_screen.dart';
 import 'package:listify/screens/about_screen.dart';
@@ -15,6 +16,8 @@ import 'package:listify/screens/splash_screen.dart';
 import 'package:listify/screens/subtask_screen.dart';
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting('id_ID', null); // Inisialisasi untuk Bahasa Indonesia
   await dotenv.load(fileName: ".env");
   runApp(const ProviderScope(child: MyApp()));
 }
