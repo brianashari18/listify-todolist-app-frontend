@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:listify/models/user_model.dart';
 import 'package:listify/screens/FAQ_screen.dart';
 import 'package:listify/screens/Feedback_screen.dart';
 import 'package:listify/screens/about_screen.dart';
 // import 'package:listify/screens/forgetPassword_Screen.dart';
 import 'package:listify/screens/helpCenter_screen.dart';
+import 'package:listify/screens/homepage_screen.dart';
 // import 'package:listify/screens/homepagePersonal_screen.dart';
 // import 'package:listify/screens/homepageWorkspace_screen.dart';
 import 'package:listify/screens/login_screen.dart';
@@ -39,6 +41,6 @@ class MyApp extends StatelessWidget {
           textTheme: GoogleFonts.nunitoTextTheme(),
           useMaterial3: true,
         ),
-        home: const SplashScreen());
+        home: SplashScreen());
   }
 }

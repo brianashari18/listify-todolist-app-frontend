@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:listify/screens/forget_password_screen.dart';
 import 'package:listify/screens/start_screen.dart';
 import 'package:listify/services/user_service.dart';
 
 import '../models/user_model.dart';
+import 'changePassword_Screen.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key, required this.user});
@@ -74,7 +74,7 @@ class _ProfileState extends State<Profile> {
                       onPressed: () {
                         Navigator.of(context).push(MaterialPageRoute(
                             builder: (context) =>
-                                const ForgetPasswordScreen()));
+                                const ChangePasswordScreen()));
                       },
                     ),
                     Spacer(),
