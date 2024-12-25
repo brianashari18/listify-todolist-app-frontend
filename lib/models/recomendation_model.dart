@@ -1,13 +1,13 @@
 class Recommendation {
   final String link;
-  final String snippet;
+  final String title;
 
   Recommendation({
     required this.link,
-    required this.snippet
+    required this.title
   });
 
   factory Recommendation.fromJson(Map<String, dynamic> json) {
-    return Recommendation(link: json['link'], snippet: json['snippet']);
+    return Recommendation(link: json['link'], title: json['title']);
   }
 }

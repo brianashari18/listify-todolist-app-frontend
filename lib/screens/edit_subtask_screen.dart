@@ -419,7 +419,7 @@ class _EditSubTaskScreenState extends ConsumerState<EditSubTaskScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                truncateText(_recommendations[index].snippet),
+                                truncateText(_recommendations[index].title),
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodyLarge!

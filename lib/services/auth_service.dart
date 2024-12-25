@@ -6,7 +6,7 @@ import 'package:listify/services/user_service.dart';
 import '../models/user_model.dart';
 
 class AuthService {
-  final _baseUrl = "http://192.168.0.185:8080/api/users";
+  final _baseUrl = "http://172.20.10.3:8080/api/users";
   final UserService _userService = UserService();
 
   Future<Map<String, dynamic>> login(String email, String password) async {

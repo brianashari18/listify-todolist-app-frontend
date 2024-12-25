@@ -565,7 +565,9 @@ class _HomepageScreenState extends ConsumerState<HomepageScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               const Text(
-                "Do you want to delete this task list?",
+                "Are you sure want to delete this task list? Once deleted, "
+                    "the task list and all its contents will be permanently removed "
+                    "and cannot be restored.",
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -588,7 +590,7 @@ class _HomepageScreenState extends ConsumerState<HomepageScreen> {
                       padding: const EdgeInsets.symmetric(
                           vertical: 12, horizontal: 30),
                     ),
-                    child: const Text("Save"),
+                    child: const Text("Yes"),
                   ),
                 ],
               ),

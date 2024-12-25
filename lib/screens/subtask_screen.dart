@@ -152,7 +152,7 @@ class _SubTaskScreenState extends ConsumerState<SubTaskScreen> {
                           task!.title,
                           style: Theme.of(context)
                               .textTheme
-                              .displayLarge!
+                              .displaySmall!
                               .copyWith(
                                 color: Theme.of(context).primaryColorLight,
                                 fontWeight: FontWeight.bold,
@@ -264,12 +264,7 @@ class _SubTaskScreenState extends ConsumerState<SubTaskScreen> {
                                         ? Theme.of(context)
                                             .primaryColorLight
                                             .withOpacity(0.5)
-                                        : Theme.of(context).primaryColorLight,
-                                    decoration:
-                                        _uncompletedSubtasks[index].status ==
-                                                'Done'
-                                            ? TextDecoration.lineThrough
-                                            : TextDecoration.none,
+                                        : Theme.of(context).primaryColorLight
                                   ),
                             ),
                             Text(
@@ -505,7 +500,7 @@ class _SubTaskScreenState extends ConsumerState<SubTaskScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text(
-                      "ADD NEW TASK",
+                      "Add New Subtask",
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -523,7 +518,7 @@ class _SubTaskScreenState extends ConsumerState<SubTaskScreen> {
                 TextField(
                   controller: _subtaskController,
                   decoration: InputDecoration(
-                    hintText: "Enter task",
+                    hintText: "Enter Subtask",
                     hintStyle:
                         const TextStyle(fontSize: 14, color: Colors.black45),
                     border: OutlineInputBorder(
@@ -596,7 +591,7 @@ class _SubTaskScreenState extends ConsumerState<SubTaskScreen> {
                         padding: const EdgeInsets.symmetric(
                             vertical: 10, horizontal: 30),
                       ),
-                      child: const Text("Done"),
+                      child: const Text("Create"),
                     ),
                   ],
                 ),
