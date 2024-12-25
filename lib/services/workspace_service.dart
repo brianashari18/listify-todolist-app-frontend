@@ -8,7 +8,7 @@ import '../models/task_model.dart';
 import '../models/user_model.dart';
 
 class WorkspaceService {
-  final _baseUrl = "http://192.168.18.11:8080/api";
+  final _baseUrl = "http://192.168.0.185:8080/api";
 
   Future<Map<String, dynamic>> loadTasks(User user) async {
     try {

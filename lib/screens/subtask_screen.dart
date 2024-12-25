@@ -17,6 +17,7 @@ class _SubTaskState extends ConsumerState<SubTask> {
   List<Map<String, dynamic>> tasks = [];
   String? _selectedStatus;
   DateTime? _selectedDate;
+  int? _deletingTaskIndex;
 
   @override
   void initState() {
@@ -93,7 +94,7 @@ class _SubTaskState extends ConsumerState<SubTask> {
             top: 270,
             left: MediaQuery.of(context).size.width / 2 - 28,
             child: FloatingActionButton(
-              onPressed: addTask,
+              onPressed: addSubTask,
               backgroundColor: Colors.white,
               shape: const CircleBorder(),
               elevation: 6,
@@ -142,9 +143,7 @@ class _SubTaskState extends ConsumerState<SubTask> {
                     trailing: IconButton(
                       icon: const Icon(Icons.delete, color: Colors.grey),
                       onPressed: () {
-                        setState(() {
-                          tasks.removeAt(index);
-                        });
+                        deleteSubTask(index);
                       },
                     ),
                   );
@@ -176,7 +175,7 @@ class _SubTaskState extends ConsumerState<SubTask> {
     }
   }
 
-  void addTask() {
+  void addSubTask() {
     final TextEditingController taskController = TextEditingController();
 
     showModalBottomSheet(
@@ -196,7 +195,7 @@ class _SubTaskState extends ConsumerState<SubTask> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text(
-                      "ADD NEW TASK",
+                      "Add New Subtask",
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -214,7 +213,7 @@ class _SubTaskState extends ConsumerState<SubTask> {
                 TextField(
                   controller: taskController,
                   decoration: InputDecoration(
-                    hintText: "Enter task",
+                    hintText: "Enter subtask",
                     hintStyle:
                         const TextStyle(fontSize: 14, color: Colors.black45),
                     border: OutlineInputBorder(
@@ -301,7 +300,7 @@ class _SubTaskState extends ConsumerState<SubTask> {
                         padding: const EdgeInsets.symmetric(
                             vertical: 10, horizontal: 30),
                       ),
-                      child: const Text("Done"),
+                      child: const Text("Create"),
                     ),
                   ],
                 ),
@@ -312,6 +311,79 @@ class _SubTaskState extends ConsumerState<SubTask> {
       },
     );
   }
+
+  void deleteSubTask(int index) {
+    setState(() {
+      _deletingTaskIndex = index;
+    });
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: const Color.fromRGBO(245, 245, 245, 1),
+      builder: (BuildContext context) {
+        return Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                "Do you want to delete this task list?",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      // _onDeleteSubmit(tasks[_deletingTaskIndex!]);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromRGBO(123, 119, 148, 1),
+                      foregroundColor: const Color.fromRGBO(245, 245, 245, 1),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 12, horizontal: 30),
+                    ),
+                    child: const Text("Save"),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  // void _onDeleteSubmit(Task task) async {
+  //   final result = _isPersonal
+  //       ? await _taskService.delete(widget.user, task)
+  //       : await _workspaceService.delete(widget.user, task);
+  //   if (result['success'] == 'true') {
+  //     ScaffoldMessenger.of(context).clearSnackBars();
+  //     ScaffoldMessenger.of(context)
+  //         .showSnackBar(const SnackBar(content: Text('Task was deleted!')));
+  //     setState(() {
+  //       tasks.removeAt(_deletingTaskIndex!);
+  //       _isSelected = false;
+  //       _deletingTaskIndex = null;
+  //     });
+  //   } else {
+  //     final errorMessage = result['error'];
+  //     ScaffoldMessenger.of(context).clearSnackBars();
+  //     ScaffoldMessenger.of(context)
+  //         .showSnackBar(SnackBar(content: Text(errorMessage)));
+  //   }
+  //   Navigator.of(context).pop();
+  // }
 
   void toggleTaskDone(int index) {
     setState(() {

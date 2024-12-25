@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import '../models/user_model.dart';
 
 class SubTaskService {
-  final String _baseUrl = "http://192.168.18.11:8080/api";
+  final String _baseUrl = "http://192.168.0.185:8080/api";
 
   Future<Map<String, dynamic>> fetchSubTasks(User user, int taskId) async {
     try {
