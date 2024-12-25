@@ -27,16 +27,6 @@ class _StartScreenState extends State<StartScreen> {
                 children: [
                   SizedBox(height: deviceHeight - deviceHeight * 0.94),
                   const CarouselWidget(),
-                  const SizedBox(height: 10),
-                  const Text(
-                    'Manage your activities and\ncreate reminders',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w500,
-                      color: Color.fromRGBO(245, 245, 245, 1),
-                    ),
-                  ),
                 ],
               ),
               Padding(

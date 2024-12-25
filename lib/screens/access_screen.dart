@@ -1,3 +1,4 @@
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:listify/models/access_model.dart';
@@ -668,12 +669,22 @@ class _AccessScreenState extends ConsumerState<AccessScreen> {
   }
 
   void _addAccess(User user, Task task, Access access) async {
+    if (access.email.isEmpty || !EmailValidator.validate(access.email) ) {
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Email not valid!')),
+      );
+      return;
+    }
+
     try {
       await ref.read(accessProvider.notifier).addAccess(user, task, access);
+      ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Access was added!')),
       );
     } catch (e) {
+      ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(e.toString())),
       );

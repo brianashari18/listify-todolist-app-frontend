@@ -6,6 +6,11 @@ final List<String> imagePaths = [
   'assets/images/login/login2.png',
 ];
 
+final List<String> descriptions = [
+  'Manage your activities and\ncreate reminders',
+  'Use workspace to\ncollaborations with others'
+];
+
 class CarouselWidget extends StatefulWidget {
   const CarouselWidget({super.key});
 
@@ -39,7 +44,17 @@ class _CarouselWidgetState extends State<CarouselWidget> {
                 });
               }),
         ),
-        buildCarouselIndicator()
+        buildCarouselIndicator(),
+        const SizedBox(height: 10),
+        Text(
+          descriptions[_activeIndicator],
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.w900,
+            color: Color.fromRGBO(245, 245, 245, 1),
+          ),
+        ),
       ],
     );
   }
