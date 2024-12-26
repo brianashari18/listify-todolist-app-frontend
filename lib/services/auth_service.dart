@@ -1,12 +1,14 @@
 import 'dart:convert';
 
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:listify/services/user_service.dart';
 
 import '../models/user_model.dart';
 
 class AuthService {
-  final _baseUrl = "http://172.20.10.3:8080/api/users";
+  final _baseUrl =
+      "http://${dotenv.env["HOST"]}:${dotenv.env["PORT"]}/api/users";
   final UserService _userService = UserService();
 
   Future<Map<String, dynamic>> login(String email, String password) async {
@@ -180,12 +182,32 @@ class AuthService {
     }
   }
 
-  Future<http.Response> getTask(String url) {
-    return http.get(Uri.parse('$_baseUrl$url'));
-  }
+  Future<Map<String, dynamic>> changeUsername(
+      User user, String username) async {
+    try {
+      final response = await http.patch(
+        Uri.parse('$_baseUrl/current/userId'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': user.token
+        },
+        body: json.encode({
+          'username': username,
+        }),
+      );
 
-  Future<http.Response> addTask(String url, Map<String, dynamic> body) {
-    return http.post(Uri.parse('$_baseUrl$url'),
-        headers: {'Content-type': 'application/json'}, body: body);
+      if (response.statusCode == 200) {
+        final body = json.decode(response.body);
+        return {'success': 'true', 'data': body['data']};
+      } else if (response.statusCode == 400) {
+        final body = json.decode(response.body);
+        return {'success': false, 'error': body['errors']};
+      } else {
+        final body = json.decode(response.body);
+        return {'success': false, 'error': body['errors']};
+      }
+    } catch (e) {
+      return {'success': false, 'error': 'Error: $e'};
+    }
   }
 }

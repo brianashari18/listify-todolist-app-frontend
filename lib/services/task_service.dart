@@ -1,12 +1,13 @@
 import 'dart:convert';
 import 'dart:ui';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 import '../models/task_model.dart';
 import '../models/user_model.dart';
 
 class TaskService {
-  final _baseUrl = "http://172.20.10.3:8080/api";
+  final _baseUrl = "http://${dotenv.env["HOST"]}:${dotenv.env["PORT"]}/api";
 
   Future<Map<String, dynamic>> loadTasks(User user) async {
     try {

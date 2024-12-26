@@ -1,10 +1,11 @@
 import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 import '../models/user_model.dart';
 
 class SubTaskService {
-  final String _baseUrl = "http://172.20.10.3:8080/api";
+  final String _baseUrl = "http://${dotenv.env["HOST"]}:${dotenv.env["PORT"]}/api";
 
   Future<Map<String, dynamic>> fetchSubTasks(User user, int taskId) async {
     try {

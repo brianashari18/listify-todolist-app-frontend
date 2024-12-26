@@ -1,10 +1,11 @@
 import 'dart:convert';
 
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:listify/models/subtask_model.dart';
 import 'package:http/http.dart' as http;
 
 class AIService {
-  final String _baseUrl = "http://172.20.10.3:5000/api";
+  final String _baseUrl = "http://${dotenv.env["HOST"]}:${dotenv.env["PORT_AI"]}/api";
 
   Future<Map<String, dynamic>> getRecommendation(SubTask subtask) async {
     try {

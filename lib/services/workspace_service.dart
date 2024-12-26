@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:ui';
 
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:listify/models/access_model.dart';
 import 'package:listify/models/subtask_model.dart';
@@ -9,11 +10,10 @@ import '../models/task_model.dart';
 import '../models/user_model.dart';
 
 class WorkspaceService {
-  final _baseUrl = "http://172.20.10.3:8080/api";
+  final _baseUrl = "http://${dotenv.env["HOST"]}:${dotenv.env["PORT"]}/api";
 
   Future<Map<String, dynamic>> loadTasks(User user) async {
     try {
-      // Debugging: print sebelum request API
       print('Fetching tasks for user ID: ${user.id}');
 
       final response = await http.get(

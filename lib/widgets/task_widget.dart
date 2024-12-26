@@ -4,7 +4,6 @@ import 'package:listify/screens/subtask_screen.dart';
 
 import '../models/access_model.dart';
 import '../models/task_model.dart';
-import '../models/user_model.dart';
 import '../providers/access_provider.dart';
 import '../providers/resource_provider.dart';
 

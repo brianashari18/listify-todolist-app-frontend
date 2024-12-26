@@ -4,16 +4,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:listify/providers/resource_provider.dart';
 import 'package:listify/screens/access_screen.dart';
 import 'package:listify/screens/profile.dart';
-import 'package:listify/screens/start_screen.dart';
 import 'package:listify/services/task_service.dart';
 import 'package:listify/services/user_service.dart';
 import 'package:listify/services/workspace_service.dart';
 import 'package:listify/widgets/side_drawer.dart';
 import 'package:listify/widgets/task_widget.dart';
-import '../models/access_model.dart';
 import '../models/task_model.dart';
 import '../models/user_model.dart';
-import '../providers/access_provider.dart';
 
 class HomepageScreen extends ConsumerStatefulWidget {
   const HomepageScreen({super.key, required this.user});
@@ -30,7 +27,6 @@ class _HomepageScreenState extends ConsumerState<HomepageScreen> {
   List<Task> tasks = [];
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final TaskService _taskService = TaskService();
-  final UserService _userService = UserService();
   final WorkspaceService _workspaceService = WorkspaceService();
 
   Color defaultColor = const Color.fromRGBO(123, 119, 148, 1);

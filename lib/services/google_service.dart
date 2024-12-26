@@ -8,7 +8,7 @@ import '../models/user_model.dart';
 
 class GoogleService {
   final UserService _userService = UserService();
-  final _baseUrl = "http://172.20.10.3:8080/api";
+  final _baseUrl = "http://${dotenv.env["HOST"]}:${dotenv.env["PORT"]}/api";
   final _googleSignIn =
       GoogleSignIn(clientId: dotenv.env["GOOGLE_WEB_CLIENT_ID"], scopes: [
     'https://www.googleapis.com/auth/userinfo.profile',
