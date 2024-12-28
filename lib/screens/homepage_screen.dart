@@ -3,7 +3,8 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:listify/providers/resource_provider.dart';
 import 'package:listify/screens/access_screen.dart';
-import 'package:listify/screens/profile.dart';
+import 'package:listify/screens/profile_screen.dart';
+import 'package:listify/screens/search_result_screen.dart';
 import 'package:listify/services/task_service.dart';
 import 'package:listify/services/user_service.dart';
 import 'package:listify/services/workspace_service.dart';
@@ -23,6 +24,7 @@ class HomepageScreen extends ConsumerStatefulWidget {
 
 class _HomepageScreenState extends ConsumerState<HomepageScreen> {
   final TextEditingController _taskController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
 
   List<Task> tasks = [];
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -150,6 +152,7 @@ class _HomepageScreenState extends ConsumerState<HomepageScreen> {
                 SizedBox(
                   height: 35,
                   child: TextField(
+                    controller: _searchController,
                     decoration: InputDecoration(
                       hintText: "Search Task",
                       hintStyle: const TextStyle(
@@ -167,6 +170,9 @@ class _HomepageScreenState extends ConsumerState<HomepageScreen> {
                       filled: true,
                       fillColor: Colors.grey[200],
                     ),
+                    onChanged: (text) {
+                      _onSearchPressed();
+                    },
                   ),
                 ),
                 const SizedBox(height: 20.0),
@@ -274,6 +280,24 @@ class _HomepageScreenState extends ConsumerState<HomepageScreen> {
       ),
     );
   }
+
+  void _onSearchPressed() async {
+    final popup = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SearchResultScreen(
+          user: widget.user,
+          query: _searchController.text,
+        ),
+      ),
+    );
+
+    // Cek apakah nilai dari popup adalah true
+    if (popup == true) {
+      _searchController.clear(); // Bersihkan text controller
+    }
+  }
+
 
   void _addTask() {
     showModalBottomSheet(
@@ -562,8 +586,8 @@ class _HomepageScreenState extends ConsumerState<HomepageScreen> {
             children: [
               const Text(
                 "Are you sure want to delete this task list? Once deleted, "
-                    "the task list and all its contents will be permanently removed "
-                    "and cannot be restored.",
+                "the task list and all its contents will be permanently removed "
+                "and cannot be restored.",
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,

@@ -17,6 +17,7 @@ class AccessScreen extends ConsumerStatefulWidget {
 
 class _AccessScreenState extends ConsumerState<AccessScreen> {
   final TextEditingController _accessController = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
 
   final List<String> accessTypes = ['View', 'Edit'];
   String? _selectedAccessAdd = 'View';
@@ -28,6 +29,13 @@ class _AccessScreenState extends ConsumerState<AccessScreen> {
     final user = ref.read(userProvider);
     final task = ref.read(activeTaskProvider);
     ref.read(accessProvider.notifier).fetchAccess(user!, task!);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _accessController.dispose();
+    _focusNode.dispose();
   }
 
   @override
@@ -310,6 +318,9 @@ class _AccessScreenState extends ConsumerState<AccessScreen> {
   }
 
   void _addBuildPopUp(User user, Task task) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _focusNode.requestFocus();
+    });
     showDialog(
       context: context,
       builder: (context) {
@@ -338,6 +349,7 @@ class _AccessScreenState extends ConsumerState<AccessScreen> {
                         flex: 2,
                         child: TextField(
                           controller: _accessController,
+                          focusNode: _focusNode,
                           style: Theme.of(context)
                               .primaryTextTheme
                               .bodyMedium!

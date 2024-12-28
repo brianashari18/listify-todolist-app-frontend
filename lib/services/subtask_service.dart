@@ -5,7 +5,8 @@ import 'package:http/http.dart' as http;
 import '../models/user_model.dart';
 
 class SubTaskService {
-  final String _baseUrl = "http://${dotenv.env["HOST"]}:${dotenv.env["PORT"]}/api";
+  final String _baseUrl =
+      "http://${dotenv.env["HOST"]}:${dotenv.env["PORT"]}/api";
 
   Future<Map<String, dynamic>> fetchSubTasks(User user, int taskId) async {
     try {
@@ -115,7 +116,8 @@ class SubTaskService {
     }
   }
 
-  Future<Map<String, dynamic>> deleteSubTask(User user, int taskId, int subTaskId) async {
+  Future<Map<String, dynamic>> deleteSubTask(
+      User user, int taskId, int subTaskId) async {
     try {
       final response = await http.delete(
         Uri.parse("$_baseUrl/tasks/$taskId/$subTaskId"),
@@ -137,14 +139,11 @@ class SubTaskService {
     }
   }
 
-
   Future<Map<String, dynamic>> restoreSubTask(User user, int subTaskId) async {
     try {
       final response = await http.post(
         Uri.parse("$_baseUrl/trash/$subTaskId/restore"),
-        headers: {
-          'Authorization': user.token
-        },
+        headers: {'Authorization': user.token},
       );
 
       if (response.statusCode == 200) {
@@ -186,6 +185,28 @@ class SubTaskService {
     }
   }
 
+  Future<Map<String, dynamic>> searchSubtask(User user, String query) async {
+    try {
+      final response = await http.get(
+          Uri.parse("$_baseUrl/users/subtask?search=$query"),
+          headers: {'Authorization': user.token});
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        print('DATA: $data');
+        return {
+          'success': true,
+          'data': data['data'],
+        };
+      } else {
+        final error = json.decode(response.body);
+        return {'success': false, 'error': error['errors']};
+      }
+    } catch (e) {
+      return {'success': false, 'error': e.toString()};
+    }
+  }
+
   String convertFrontendToBackendDate(String frontendDate) {
     List<String> parts = frontendDate.split('/');
     if (parts.length != 3) {
@@ -198,5 +219,4 @@ class SubTaskService {
 
     return '$year-$month-$day';
   }
-
 }

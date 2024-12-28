@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:listify/screens/about_screen.dart';
-import 'package:listify/screens/helpCenter_screen.dart';
+import 'package:listify/screens/help_center_screen.dart';
 import 'package:listify/screens/homepage_screen.dart';
 import 'package:listify/screens/setting_screen.dart';
 import 'package:listify/screens/trash_screen.dart';

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:listify/screens/FAQ_screen.dart';
-import 'package:listify/screens/Feedback_screen.dart';
+import 'package:listify/screens/faq_screen.dart';
+import 'package:listify/screens/feedback_screen.dart';
 
 class HelpCenter extends StatelessWidget {
   const HelpCenter({super.key});

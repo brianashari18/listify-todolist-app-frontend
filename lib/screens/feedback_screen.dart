@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:listify/screens/helpCenter_screen.dart';
+import 'package:listify/screens/help_center_screen.dart';
 
 class FeedbackApp extends StatelessWidget {
   const FeedbackApp({super.key});
