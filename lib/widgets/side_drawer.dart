@@ -33,20 +33,6 @@ class SideDrawer extends ConsumerWidget {
             const SizedBox(
               height: 10,
             ),
-            // ListTile(
-            //   leading: const Icon(Icons.folder_copy_outlined),
-            //   title: const Text('Task List'),
-            //   onTap: () {
-            //     userAsyncValue.when(
-            //         data: (data) => Navigator.of(context).push(
-            //             MaterialPageRoute(
-            //                 builder: (context) => HomepageScreen(user: data!))),
-            //         error: (error, stackTrace) => print(error),
-            //         loading: () {
-            //           const CircularProgressIndicator();
-            //         });
-            //   },
-            // ),
             ListTile(
               leading: const Icon(Icons.delete_outline),
               title: const Text('Trash'),
